@@ -2,8 +2,9 @@ Pong
 ====
 
 This is a Pong version of me that I made during my college days.
-It is optimized for an educational C-IDE called VirtualC-IDE.
+The original version was written in C for SDL1 and a educational C IDE called VirtualC-IDE.
 
-If you want to use this game compiled with a normal compiler, you must have linked SDL in version 1.x.
+I converted the hole code to C++ with CMake and SDL3.
 
-Due to the dependency on the deprecated SDL version, the game can no longer be run everywhere.
+TODO:
+* [ ] Refactor code 
