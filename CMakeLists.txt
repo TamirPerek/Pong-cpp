@@ -67,5 +67,5 @@ target_link_libraries(
 
 add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/img/ $<TARGET_FILE_DIR:${PROJECT_NAME}>/img/)
+                       ${CMAKE_SOURCE_DIR}/assets/ $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets/)
 

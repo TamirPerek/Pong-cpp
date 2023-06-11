@@ -121,7 +121,7 @@ public:
 	WindowSize mWindowSize;
 	// TTF_Font *Sans{TTF_OpenFont("Sans.ttf", 24)};
 	// SDL_Color White{255, 255, 255};
-	unique_font_t mFont{TTF_OpenFont("img/DS-DIGI.TTF", 24)};
+	unique_font_t mFont{TTF_OpenFont("assets/DS-DIGI.TTF", 24)};
 	unsigned int mValueOne{0U};
 	unsigned int mValueTwo{0U};
 	// unique_surface_t mMessage;
@@ -163,6 +163,16 @@ public:
 
 		if (SDL_RenderCopy(xRenderer.get(), Message.get(), nullptr, *this) != 0)
 			std::cerr << "Unable to show points\n";
+
+		if (mWindowSize == xWindowSize)
+			return;
+
+		mRect.w = (mRect.w * xWindowSize.w) / mWindowSize.w;
+		mRect.h = (mRect.h * xWindowSize.h) / mWindowSize.h;
+		mRect.x = (mRect.x * xWindowSize.w) / mWindowSize.w;
+		mRect.y = (mRect.y * xWindowSize.h) / mWindowSize.h;
+
+		mWindowSize = xWindowSize;
 	}
 };
 
@@ -219,13 +229,13 @@ int main()
 			break;
 		}
 
-		if (tKeyPressed.at(SDLK_UP))
+		if (tKeyPressed.at(SDLK_UP) && tPlayerOne.mRect.y > 0)
 			tPlayerOne.mRect.y -= (5 * tWindowSize.hRatio);
-		if (tKeyPressed.at(SDLK_DOWN))
+		if (tKeyPressed.at(SDLK_DOWN) && tPlayerOne.mRect.y < tWindowSize.h)
 			tPlayerOne.mRect.y += (5 * tWindowSize.hRatio);
-		if (tKeyPressed.at(SDLK_w))
+		if (tKeyPressed.at(SDLK_w) && tPlayerTwo.mRect.y > 0)
 			tPlayerTwo.mRect.y -= (5 * tWindowSize.hRatio);
-		if (tKeyPressed.at(SDLK_s))
+		if (tKeyPressed.at(SDLK_s) && tPlayerTwo.mRect.y < tWindowSize.h)
 			tPlayerTwo.mRect.y += (5 * tWindowSize.hRatio);
 		if (tKeyPressed.at(SDLK_ESCAPE))
 		{
