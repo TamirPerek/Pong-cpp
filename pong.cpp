@@ -206,6 +206,8 @@ int main()
 	bool isquit = false;
 	SDL_Event event;
 
+	bool run{true};
+
 	std::map<int, bool> tKeyPressed{{SDLK_UP, false}, {SDLK_DOWN, false}, {SDLK_w, false}, {SDLK_s, false}, {SDLK_ESCAPE, false}};
 	while (!isquit)
 	{
@@ -231,17 +233,20 @@ int main()
 
 		if (tKeyPressed.at(SDLK_UP) && tPlayerOne.mRect.y > 0)
 			tPlayerOne.mRect.y -= (5 * tWindowSize.hRatio);
-		if (tKeyPressed.at(SDLK_DOWN) && tPlayerOne.mRect.y < tWindowSize.h)
+		if (tKeyPressed.at(SDLK_DOWN) && tPlayerOne.mRect.y + tPlayerOne.mRect.h < tWindowSize.h)
 			tPlayerOne.mRect.y += (5 * tWindowSize.hRatio);
 		if (tKeyPressed.at(SDLK_w) && tPlayerTwo.mRect.y > 0)
 			tPlayerTwo.mRect.y -= (5 * tWindowSize.hRatio);
-		if (tKeyPressed.at(SDLK_s) && tPlayerTwo.mRect.y < tWindowSize.h)
+		if (tKeyPressed.at(SDLK_s) && tPlayerTwo.mRect.y + tPlayerTwo.mRect.h < tWindowSize.h)
 			tPlayerTwo.mRect.y += (5 * tWindowSize.hRatio);
 		if (tKeyPressed.at(SDLK_ESCAPE))
 		{
 			isquit = true;
 			break;
 		}
+
+		if (!run)
+			continue;
 
 		tWindowSize = WindowSize{window};
 		tPlayerOne.update(tWindowSize);
@@ -269,12 +274,16 @@ int main()
 		{
 			tBall.Resett();
 			++tPoints.mValueTwo;
+			if(tPoints.mValueTwo == 9)
+				run = false;
 		}
 
 		if (tBall.mRect.x > tWindowSize.w)
 		{
 			tBall.Resett();
 			++tPoints.mValueOne;
+			if (tPoints.mValueOne == 9)
+				run = false;
 		}
 	}
 
