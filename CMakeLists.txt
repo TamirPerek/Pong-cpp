@@ -31,7 +31,15 @@ FetchContent_Declare(
     GIT_PROGRESS    TRUE
 )
 
-FetchContent_MakeAvailable(SDL SDL_TTF)
+# fmt
+FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY  https://github.com/fmtlib/fmt.git
+    GIT_TAG         10.0.0
+    GIT_PROGRESS    TRUE
+)
+
+FetchContent_MakeAvailable(SDL SDL_TTF fmt)
 
 # set(SDL_LIBRARIES ${SDL_LIBRARIES} SDL2main SDL2-static SDL2_ttf)
 # target_include_directories("${PROJECT_NAME}" PRIVATE include)
@@ -46,11 +54,15 @@ add_executable(
     pong.cpp
 )
 
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+
 target_link_libraries(
     ${PROJECT_NAME}    
     SDL2::SDL2
     SDL2::SDL2main
     SDL2_ttf::SDL2_ttf
+    fmt::fmt
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD

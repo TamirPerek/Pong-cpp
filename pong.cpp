@@ -9,6 +9,7 @@
 #include <random>
 #include <cassert>
 #include <functional>
+#include <fmt/format.h>
 
 class UIElement
 {
@@ -120,13 +121,21 @@ public:
 	WindowSize mWindowSize;
 	// TTF_Font *Sans{TTF_OpenFont("Sans.ttf", 24)};
 	// SDL_Color White{255, 255, 255};
-	unsigned int mValue{0U};
+	unique_font_t mFont{TTF_OpenFont("img/DS-DIGI.TTF", 24)};
+	unsigned int mValueOne{0U};
+	unsigned int mValueTwo{0U};
 	// unique_surface_t mMessage;
 
 	explicit Points(const WindowSize &xWindowSize)
 		: mWindowSize{xWindowSize},
-		  UIElement{SDL_Rect{0, 0, 100, 100}}
+		  UIElement{SDL_Rect{0, 0, 500, 200}}
 	{
+		if (!mFont)
+		{
+			constexpr static std::string_view errormsg{"Error: unable to load font\n"};
+			std::cerr << errormsg;
+			throw std::runtime_error(errormsg.data());
+		}
 	}
 
 	~Points() = default;
@@ -138,30 +147,22 @@ public:
 
 	void update(const WindowSize &xWindowSize, unique_renderer_t &xRenderer) noexcept
 	{
-		auto tFont = TTF_OpenFont("img/DS-DIGI.TTF", 24);
-		if (!tFont)
-		{
-			std::cerr << "Konnte Font nicht laden\n";
-			return;
-		}
-
-		unique_surface_t tMessageSurface{TTF_RenderText_Solid(tFont, "99", SDL_Color{255, 255, 255})};
+		auto tScore = fmt::format("{} : {}", mValueOne, mValueTwo);
+		unique_surface_t tMessageSurface{TTF_RenderText_Solid(mFont.get(), tScore.c_str(), SDL_Color{255, 255, 255})};
 		if (!tMessageSurface)
 		{
-			std::cerr << "Konnte tMessageSurface nicht rendern\n";
-			return;
+			std::cerr << "Unable to render text\n";
 		}
 
-		SDL_Texture *Message = SDL_CreateTextureFromSurface(xRenderer.get(), tMessageSurface.get());
+		unique_texture_t Message{SDL_CreateTextureFromSurface(xRenderer.get(), tMessageSurface.get())};
 		if (!Message)
 		{
-			std::cerr << "Konnte Message nicht erstellen\n";
+			std::cerr << "Unable to create texture\n";
 			return;
 		}
 
-		SDL_RenderCopy(xRenderer.get(), Message, NULL, *this);
-		SDL_DestroyTexture(Message);
-		TTF_CloseFont(tFont);
+		if (SDL_RenderCopy(xRenderer.get(), Message.get(), nullptr, *this) != 0)
+			std::cerr << "Unable to show points\n";
 	}
 };
 
@@ -189,7 +190,8 @@ int main()
 
 	Ball tBall{tWindowSize};
 
-	Points tPointsPlayerOne{tWindowSize};
+	Points tPoints{tWindowSize};
+	tPoints.mRect.x = (tWindowSize.w / 2) - (tPoints.mRect.w / 2);
 
 	bool isquit = false;
 	SDL_Event event;
@@ -235,11 +237,11 @@ int main()
 		tPlayerOne.update(tWindowSize);
 		tPlayerTwo.update(tWindowSize);
 		tBall.update(tWindowSize, tPlayerOne, tPlayerTwo);
-		tPointsPlayerOne.update(tWindowSize, tRenderer);
+		tPoints.update(tWindowSize, tRenderer);
 
 		SDL_SetRenderDrawColor(tRenderer.get(), 66, 66, 66, 255);
 		SDL_RenderClear(tRenderer.get());
-		tPointsPlayerOne.update(tWindowSize, tRenderer);
+		tPoints.update(tWindowSize, tRenderer);
 
 		SDL_SetRenderDrawColor(tRenderer.get(), 255, 255, 255, 255);
 		SDL_RenderFillRect(tRenderer.get(), tBall);
@@ -254,10 +256,16 @@ int main()
 
 		// Points
 		if (tBall.mRect.x + tBall.mRect.w < 0)
+		{
 			tBall.Resett();
+			++tPoints.mValueTwo;
+		}
 
 		if (tBall.mRect.x > tWindowSize.w)
+		{
 			tBall.Resett();
+			++tPoints.mValueOne;
+		}
 	}
 
 	SDL_Quit();
