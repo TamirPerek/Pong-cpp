@@ -7,6 +7,8 @@
 #include <map>
 #include <iostream>
 #include <random>
+#include <cassert>
+#include <functional>
 
 class UIElement
 {
