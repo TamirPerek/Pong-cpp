@@ -288,4 +288,6 @@ int main()
 	}
 
 	SDL_Quit();
+
+	return EXIT_SUCCESS;
 }
