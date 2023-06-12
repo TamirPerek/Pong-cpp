@@ -14,8 +14,8 @@ public:
 	explicit UIElement(SDL_Rect&& xRect);
 
 	virtual ~UIElement() = default;
-	virtual void update(const WindowSize& xWindowSize) noexcept = 0;
-	virtual void render(SDL_Renderer&) noexcept = 0;
+	virtual UIElement &update(const WindowSize& xWindowSize) noexcept = 0;
+	virtual UIElement &render(SDL_Renderer&) noexcept = 0;
 	explicit operator SDL_Rect const* () const;
 	explicit operator SDL_Rect* ();
 };

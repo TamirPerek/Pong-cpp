@@ -11,28 +11,32 @@
 #include <vector>
 #include <algorithm>
 
-std::vector<UIElement> CreateElements(const WindowSize &xWindowSize) noexcept
+std::vector<std::shared_ptr<UIElement>> CreateElements(const WindowSize& xWindowSize, std::map<int, bool>& xKeysPressed) noexcept
 {
-	std::vector<UIElement> tResult;
+	std::vector<std::shared_ptr<UIElement>> tResult;
 
-	Player tPlayerOne{ xWindowSize };
-	tPlayerOne.mRect.x = xWindowSize.w - (tPlayerOne.mRect.w * 2);
-	tPlayerOne.mRect.y = (xWindowSize.h / 2) - (tPlayerOne.mRect.h / 2);
-	tResult.emplace_back(tPlayerOne);
+	std::shared_ptr<UIElement> tPlayerOne{ std::make_shared<Player>(xWindowSize, xKeysPressed, SDLK_UP, SDLK_DOWN) };
+	tPlayerOne->mRect.x = xWindowSize.w - (tPlayerOne->mRect.w * 2);
+	tPlayerOne->mRect.y = (xWindowSize.h / 2) - (tPlayerOne->mRect.h / 2);
 
-	Player tPlayerTwo{ xWindowSize };
-	tPlayerTwo.mRect.x = tPlayerTwo.mRect.w;
-	tPlayerTwo.mRect.y = (xWindowSize.h / 2) - (tPlayerTwo.mRect.h / 2);
+	std::shared_ptr<UIElement> tPlayerTwo{ std::make_shared<Player>(xWindowSize, xKeysPressed, SDLK_w, SDLK_s) };
+	tPlayerTwo->mRect.x = tPlayerTwo->mRect.w;
+	tPlayerTwo->mRect.y = (xWindowSize.h / 2) - (tPlayerTwo->mRect.h / 2);
 
-	Ball tBall{ xWindowSize, tPlayerOne, tPlayerTwo };
+	std::shared_ptr<UIElement> tPoints{ std::make_shared<Points>(xWindowSize) };
+	tPoints->mRect.x = (xWindowSize.w / 2) - (tPoints->mRect.w / 2);
 
-	Points tPoints{ xWindowSize };
-	tPoints.mRect.x = (xWindowSize.w / 2) - (tPoints.mRect.w / 2);
+	std::shared_ptr<UIElement> tBall{ std::make_shared<Ball>(xWindowSize, tPlayerOne, tPlayerTwo, std::static_pointer_cast<Points>(tPoints)) };
+
+	tResult.emplace_back(std::move(tPlayerOne));
+	tResult.emplace_back(std::move(tPlayerTwo));
+	tResult.emplace_back(std::move(tBall));
+	tResult.emplace_back(std::move(tPoints));
 
 	return tResult;
 }
 
-int main(int argc, char* argv[])
+int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		return EXIT_FAILURE;
@@ -44,14 +48,15 @@ int main(int argc, char* argv[])
 
 	WindowSize tWindowSize{ *window };
 
-	auto tUIElements{CreateElements(tWindowSize)};
+	std::map<int, bool> tKeyPressed{ {SDLK_UP, false}, {SDLK_DOWN, false}, {SDLK_w, false}, {SDLK_s, false}, {SDLK_ESCAPE, false} };
+
+	auto tUIElements{ CreateElements(tWindowSize, tKeyPressed) };
 
 	bool isquit = false;
 	SDL_Event event;
 
 	bool run{ true };
 
-	std::map<int, bool> tKeyPressed{ {SDLK_UP, false}, {SDLK_DOWN, false}, {SDLK_w, false}, {SDLK_s, false}, {SDLK_ESCAPE, false} };
 	while (!isquit)
 	{
 		SDL_Delay(10);
@@ -74,14 +79,6 @@ int main(int argc, char* argv[])
 			break;
 		}
 
-		// if (tKeyPressed.at(SDLK_UP) && tPlayerOne.mRect.y > 0)
-		// 	tPlayerOne.mRect.y -= static_cast<int>(5 * tWindowSize.hRatio);
-		// if (tKeyPressed.at(SDLK_DOWN) && tPlayerOne.mRect.y + tPlayerOne.mRect.h < tWindowSize.h)
-		// 	tPlayerOne.mRect.y += static_cast<int>(5 * tWindowSize.hRatio);
-		// if (tKeyPressed.at(SDLK_w) && tPlayerTwo.mRect.y > 0)
-		// 	tPlayerTwo.mRect.y -= static_cast<int>(5 * tWindowSize.hRatio);
-		// if (tKeyPressed.at(SDLK_s) && tPlayerTwo.mRect.y + tPlayerTwo.mRect.h < tWindowSize.h)
-		// 	tPlayerTwo.mRect.y += static_cast<int>(5 * tWindowSize.hRatio);
 		if (tKeyPressed.at(SDLK_ESCAPE))
 			isquit = true;
 
@@ -90,42 +87,16 @@ int main(int argc, char* argv[])
 		SDL_SetRenderDrawColor(tRenderer.get(), 66, 66, 66, 255);
 		SDL_RenderClear(tRenderer.get());
 
-		std::ranges::for_each(tUIElements, [&tWindowSize, &tRenderer] (auto &xUIElement)
-		{
-			xUIElement.update(tWindowSize);
-			xUIElement.render(*tRenderer);
-		});
-
-		// tPlayerOne.update(tWindowSize);
-		// tPlayerTwo.update(tWindowSize);
-		// tBall.update(tWindowSize);
-		// tPoints.update(tWindowSize);
-		// tBall.render(*tRenderer);
-		// tPlayerOne.render(*tRenderer);
-		// tPlayerTwo.render(*tRenderer);
-		// tPoints.render(*tRenderer);
+		std::ranges::for_each(tUIElements, [&tWindowSize, &tRenderer](auto& xUIElement)
+			{
+				xUIElement->update(tWindowSize)
+					.render(*tRenderer);
+			});
 
 		SDL_RenderPresent(tRenderer.get());
 
 		if (!run)
 			continue;
-
-		// Points
-		// if (tBall.mRect.x + tBall.mRect.w < 0)
-		// {
-		// 	tBall.Resett();
-		// 	++tPoints.mValueTwo;
-		// 	if (tPoints.mValueTwo == 9)
-		// 		run = false;
-		// }
-
-		// if (tBall.mRect.x > tWindowSize.w)
-		// {
-		// 	tBall.Resett();
-		// 	++tPoints.mValueOne;
-		// 	if (tPoints.mValueOne == 9)
-		// 		run = false;
-		// }
 	}
 
 	SDL_Quit();
