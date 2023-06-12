@@ -19,10 +19,18 @@ Points::Points(const WindowSize& xWindowSize)
 
 void Points::update(const WindowSize& xWindowSize) noexcept
 {
-	assert(false);
+	if (mWindowSize == xWindowSize)
+		return;
+
+	mRect.w = (mRect.w * xWindowSize.w) / mWindowSize.w;
+	mRect.h = (mRect.h * xWindowSize.h) / mWindowSize.h;
+	mRect.x = (mRect.x * xWindowSize.w) / mWindowSize.w;
+	mRect.y = (mRect.y * xWindowSize.h) / mWindowSize.h;
+
+	mWindowSize = xWindowSize;
 }
 
-void Points::update(const WindowSize& xWindowSize, SDL_Renderer& xRenderer) noexcept
+void Points::render(SDL_Renderer& xRenderer) noexcept
 {
 	auto tScore = fmt::format("{} : {}", mValueOne, mValueTwo);
 	unique_surface_t tMessageSurface{ TTF_RenderText_Solid(mFont.get(), tScore.c_str(), SDL_Color{255, 255, 255}) };
@@ -40,14 +48,5 @@ void Points::update(const WindowSize& xWindowSize, SDL_Renderer& xRenderer) noex
 
 	if (SDL_RenderCopy(&xRenderer, Message.get(), nullptr, static_cast<const SDL_Rect*>(*this)) != 0)
 		std::cerr << "Unable to show points\n";
-
-	if (mWindowSize == xWindowSize)
-		return;
-
-	mRect.w = (mRect.w * xWindowSize.w) / mWindowSize.w;
-	mRect.h = (mRect.h * xWindowSize.h) / mWindowSize.h;
-	mRect.x = (mRect.x * xWindowSize.w) / mWindowSize.w;
-	mRect.y = (mRect.y * xWindowSize.h) / mWindowSize.h;
-
-	mWindowSize = xWindowSize;
 }
+

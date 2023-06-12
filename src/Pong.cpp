@@ -8,6 +8,29 @@
 #include <SDL.h>
 
 #include <map>
+#include <vector>
+#include <algorithm>
+
+std::vector<UIElement> CreateElements(const WindowSize &xWindowSize) noexcept
+{
+	std::vector<UIElement> tResult;
+
+	Player tPlayerOne{ xWindowSize };
+	tPlayerOne.mRect.x = xWindowSize.w - (tPlayerOne.mRect.w * 2);
+	tPlayerOne.mRect.y = (xWindowSize.h / 2) - (tPlayerOne.mRect.h / 2);
+	tResult.emplace_back(tPlayerOne);
+
+	Player tPlayerTwo{ xWindowSize };
+	tPlayerTwo.mRect.x = tPlayerTwo.mRect.w;
+	tPlayerTwo.mRect.y = (xWindowSize.h / 2) - (tPlayerTwo.mRect.h / 2);
+
+	Ball tBall{ xWindowSize, tPlayerOne, tPlayerTwo };
+
+	Points tPoints{ xWindowSize };
+	tPoints.mRect.x = (xWindowSize.w / 2) - (tPoints.mRect.w / 2);
+
+	return tResult;
+}
 
 int main(int argc, char* argv[])
 {
@@ -21,18 +44,7 @@ int main(int argc, char* argv[])
 
 	WindowSize tWindowSize{ *window };
 
-	Player tPlayerOne{ tWindowSize };
-	tPlayerOne.mRect.x = tWindowSize.w - (tPlayerOne.mRect.w * 2);
-	tPlayerOne.mRect.y = (tWindowSize.h / 2) - (tPlayerOne.mRect.h / 2);
-
-	Player tPlayerTwo{ tWindowSize };
-	tPlayerTwo.mRect.x = tPlayerTwo.mRect.w;
-	tPlayerTwo.mRect.y = (tWindowSize.h / 2) - (tPlayerTwo.mRect.h / 2);
-
-	Ball tBall{ tWindowSize };
-
-	Points tPoints{ tWindowSize };
-	tPoints.mRect.x = (tWindowSize.w / 2) - (tPoints.mRect.w / 2);
+	auto tUIElements{CreateElements(tWindowSize)};
 
 	bool isquit = false;
 	SDL_Event event;
@@ -62,34 +74,36 @@ int main(int argc, char* argv[])
 			break;
 		}
 
-		if (tKeyPressed.at(SDLK_UP) && tPlayerOne.mRect.y > 0)
-			tPlayerOne.mRect.y -= static_cast<int>(5 * tWindowSize.hRatio);
-		if (tKeyPressed.at(SDLK_DOWN) && tPlayerOne.mRect.y + tPlayerOne.mRect.h < tWindowSize.h)
-			tPlayerOne.mRect.y += static_cast<int>(5 * tWindowSize.hRatio);
-		if (tKeyPressed.at(SDLK_w) && tPlayerTwo.mRect.y > 0)
-			tPlayerTwo.mRect.y -= static_cast<int>(5 * tWindowSize.hRatio);
-		if (tKeyPressed.at(SDLK_s) && tPlayerTwo.mRect.y + tPlayerTwo.mRect.h < tWindowSize.h)
-			tPlayerTwo.mRect.y += static_cast<int>(5 * tWindowSize.hRatio);
+		// if (tKeyPressed.at(SDLK_UP) && tPlayerOne.mRect.y > 0)
+		// 	tPlayerOne.mRect.y -= static_cast<int>(5 * tWindowSize.hRatio);
+		// if (tKeyPressed.at(SDLK_DOWN) && tPlayerOne.mRect.y + tPlayerOne.mRect.h < tWindowSize.h)
+		// 	tPlayerOne.mRect.y += static_cast<int>(5 * tWindowSize.hRatio);
+		// if (tKeyPressed.at(SDLK_w) && tPlayerTwo.mRect.y > 0)
+		// 	tPlayerTwo.mRect.y -= static_cast<int>(5 * tWindowSize.hRatio);
+		// if (tKeyPressed.at(SDLK_s) && tPlayerTwo.mRect.y + tPlayerTwo.mRect.h < tWindowSize.h)
+		// 	tPlayerTwo.mRect.y += static_cast<int>(5 * tWindowSize.hRatio);
 		if (tKeyPressed.at(SDLK_ESCAPE))
 			isquit = true;
 
 		tWindowSize = WindowSize{ *window };
-		tPlayerOne.update(tWindowSize);
-		tPlayerTwo.update(tWindowSize);
-		tBall.update(tWindowSize, tPlayerOne, tPlayerTwo);
 
 		SDL_SetRenderDrawColor(tRenderer.get(), 66, 66, 66, 255);
 		SDL_RenderClear(tRenderer.get());
-		tPoints.update(tWindowSize, *tRenderer);
 
-		SDL_SetRenderDrawColor(tRenderer.get(), 255, 255, 255, 255);
-		SDL_RenderFillRect(tRenderer.get(), static_cast<const SDL_Rect*>(tBall));
+		std::ranges::for_each(tUIElements, [&tWindowSize, &tRenderer] (auto &xUIElement)
+		{
+			xUIElement.update(tWindowSize);
+			xUIElement.render(*tRenderer);
+		});
 
-		SDL_SetRenderDrawColor(tRenderer.get(), 255, 255, 255, 255);
-		SDL_RenderFillRect(tRenderer.get(), static_cast<const SDL_Rect*>(tPlayerOne));
-
-		SDL_SetRenderDrawColor(tRenderer.get(), 255, 255, 255, 255);
-		SDL_RenderFillRect(tRenderer.get(), static_cast<const SDL_Rect*>(tPlayerTwo));
+		// tPlayerOne.update(tWindowSize);
+		// tPlayerTwo.update(tWindowSize);
+		// tBall.update(tWindowSize);
+		// tPoints.update(tWindowSize);
+		// tBall.render(*tRenderer);
+		// tPlayerOne.render(*tRenderer);
+		// tPlayerTwo.render(*tRenderer);
+		// tPoints.render(*tRenderer);
 
 		SDL_RenderPresent(tRenderer.get());
 
@@ -97,21 +111,21 @@ int main(int argc, char* argv[])
 			continue;
 
 		// Points
-		if (tBall.mRect.x + tBall.mRect.w < 0)
-		{
-			tBall.Resett();
-			++tPoints.mValueTwo;
-			if (tPoints.mValueTwo == 9)
-				run = false;
-		}
+		// if (tBall.mRect.x + tBall.mRect.w < 0)
+		// {
+		// 	tBall.Resett();
+		// 	++tPoints.mValueTwo;
+		// 	if (tPoints.mValueTwo == 9)
+		// 		run = false;
+		// }
 
-		if (tBall.mRect.x > tWindowSize.w)
-		{
-			tBall.Resett();
-			++tPoints.mValueOne;
-			if (tPoints.mValueOne == 9)
-				run = false;
-		}
+		// if (tBall.mRect.x > tWindowSize.w)
+		// {
+		// 	tBall.Resett();
+		// 	++tPoints.mValueOne;
+		// 	if (tPoints.mValueOne == 9)
+		// 		run = false;
+		// }
 	}
 
 	SDL_Quit();

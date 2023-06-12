@@ -3,6 +3,7 @@
 #include "../WindowSize.h"
 
 #include <SDL_rect.h>
+#include <SDL_render.h>
 
 class UIElement
 {
@@ -14,6 +15,7 @@ public:
 
 	virtual ~UIElement() = default;
 	virtual void update(const WindowSize& xWindowSize) noexcept = 0;
+	virtual void render(SDL_Renderer&) noexcept = 0;
 	explicit operator SDL_Rect const* () const;
 	explicit operator SDL_Rect* ();
 };

@@ -12,4 +12,5 @@ public:
 	~Player() final = default;
 
 	void update(const WindowSize& xWindowSize) noexcept final;
+	void render(SDL_Renderer&) noexcept final;
 };

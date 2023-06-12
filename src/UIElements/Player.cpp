@@ -18,3 +18,10 @@ void Player::update(const WindowSize& xWindowSize) noexcept
 
 	mWindowSize = xWindowSize;
 }
+
+void Player::render(SDL_Renderer& xRenderer) noexcept
+{
+	SDL_SetRenderDrawColor(&xRenderer, 255, 255, 255, 255);
+	SDL_RenderFillRect(&xRenderer, static_cast<const SDL_Rect*>(*this));
+}
+

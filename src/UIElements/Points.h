@@ -16,7 +16,6 @@ public:
 
 	~Points() final = default;
 
-	[[noreturn]] void update(const WindowSize& xWindowSize) noexcept final;
-
-	void update(const WindowSize& xWindowSize, SDL_Renderer& xRenderer) noexcept;
+	void update(const WindowSize& xWindowSize) noexcept final;
+	void render(SDL_Renderer&) noexcept final;
 };

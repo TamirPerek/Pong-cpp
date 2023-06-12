@@ -4,24 +4,21 @@
 #include <functional>
 #include <cassert>
 
-Ball::Ball(const WindowSize& xWindowSize)
+Ball::Ball(const WindowSize& xWindowSize, const Player &xPlayerOne, const Player &xPlayerTwo)
 	: UIElement{ SDL_Rect{0, 0, static_cast<int>((xWindowSize.h / 50) * xWindowSize.hRatio), static_cast<int>((xWindowSize.h / 50) * xWindowSize.hRatio)} },
-	mWindowSize{ xWindowSize }
+	mWindowSize{ xWindowSize },
+	mPlayerOne{xPlayerOne},
+	mPlayerTwo{xPlayerTwo}
 {
 	Resett();
 }
 
 void Ball::update(const WindowSize& xWindowSize) noexcept
 {
-	assert(false);
-}
-
-void Ball::update(const WindowSize& xWindowSize, const Player& xPlayerOne, const Player& xPlayerTwo) noexcept
-{
-	if (mXSpeed > 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(*this), static_cast<const SDL_Rect*>(xPlayerOne)) == SDL_TRUE)
+	if (mXSpeed > 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(*this), static_cast<const SDL_Rect*>(mPlayerOne)) == SDL_TRUE)
 		mXSpeed *= -1.0;
 
-	if (mXSpeed < 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(*this), static_cast<const SDL_Rect*>(xPlayerTwo)) == SDL_TRUE)
+	if (mXSpeed < 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(*this), static_cast<const SDL_Rect*>(mPlayerTwo)) == SDL_TRUE)
 		mXSpeed *= -1.0;
 
 	if (mRect.y < 0 || mRect.y + mRect.h > mWindowSize.h)
@@ -41,6 +38,12 @@ void Ball::update(const WindowSize& xWindowSize, const Player& xPlayerOne, const
 	mRect.y = (mRect.y * xWindowSize.h) / mWindowSize.h;
 
 	mWindowSize = xWindowSize;
+}
+
+void Ball::render(SDL_Renderer& xRenderer) noexcept
+{
+	SDL_SetRenderDrawColor(&xRenderer, 255, 255, 255, 255);
+	SDL_RenderFillRect(&xRenderer, static_cast<const SDL_Rect*>(*this));
 }
 
 void Ball::Resett() noexcept
