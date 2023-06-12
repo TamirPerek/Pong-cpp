@@ -10,11 +10,7 @@ Points::Points(const WindowSize& xWindowSize)
 	mWindowSize{ xWindowSize }
 {
 	if (!mFont)
-	{
-		constexpr static std::string_view errormsg{ "Error: unable to load font\n" };
-		std::cerr << errormsg;
-		throw std::runtime_error(errormsg.data());
-	}
+		throw std::runtime_error("Unable to load font");
 }
 
 Points& Points::update(const WindowSize& xWindowSize) noexcept

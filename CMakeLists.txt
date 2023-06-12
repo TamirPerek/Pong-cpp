@@ -44,6 +44,8 @@ FetchContent_MakeAvailable(SDL SDL_TTF fmt)
 add_executable(
     ${PROJECT_NAME}
     src/Pong.cpp
+    src/Game.h
+    src/Game.cpp
     src/SDLElements.h
     src/WindowSize.h
     src/UIElements/UIElement.h
@@ -54,6 +56,10 @@ add_executable(
     src/UIElements/Ball.cpp
     src/UIElements/Points.h
     src/UIElements/Points.cpp
+    src/UIElements/Field.h
+    src/UIElements/Field.cpp
+    src/UIElements/MiddleLine.h
+    src/UIElements/MiddleLine.cpp
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
