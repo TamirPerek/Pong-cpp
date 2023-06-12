@@ -12,26 +12,18 @@ public:
     double hRatio{1.0};
 
     WindowSize() = default;
-    explicit WindowSize(const unique_window_t &xWindow)
+    explicit WindowSize(SDL_Window &xWindow)
     {
-        SDL_GL_GetDrawableSize(xWindow.get(), &w, &h);
+        SDL_GL_GetDrawableSize(&xWindow, &w, &h);
         int tW{0};
         int tH{0};
-        SDL_GetWindowSize(xWindow.get(), &tW, &tH);
+        SDL_GetWindowSize(&xWindow, &tW, &tH);
         wRatio = static_cast<double>(w) / tW;
         hRatio = static_cast<double>(h) / tH;
     }
 
-    bool operator==(const WindowSize &xOther)
+    bool operator==(const WindowSize &xOther) const
     {
         return w == xOther.w && h == xOther.h;
-    }
-    bool operator!=(const WindowSize &xOther)
-    {
-        return !(*this == xOther);
-    }
-    SDL_Rect GetRect() const noexcept
-    {
-        return SDL_Rect{0, 0, w, h};
     }
 };

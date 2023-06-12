@@ -7,7 +7,7 @@
 
 struct SDLWindowDeleter
 {
-    void operator()(SDL_Window *xWindow)
+    void operator()(SDL_Window *xWindow) const
     {
         if (xWindow)
             SDL_DestroyWindow(xWindow);
@@ -15,7 +15,7 @@ struct SDLWindowDeleter
 };
 struct SDLSurfaceDeleter
 {
-    void operator()(SDL_Surface *xSurface)
+    void operator()(SDL_Surface *xSurface) const
     {
         if (xSurface)
             SDL_FreeSurface(xSurface);
@@ -24,7 +24,7 @@ struct SDLSurfaceDeleter
 
 struct SDLRendererDeleter
 {
-    void operator()(SDL_Renderer *xRenderer)
+    void operator()(SDL_Renderer *xRenderer) const
     {
         if (xRenderer)
             SDL_DestroyRenderer(xRenderer);
@@ -33,7 +33,7 @@ struct SDLRendererDeleter
 
 struct SDLTTFFontDeleter
 {
-    void operator()(TTF_Font * xFont)
+    void operator()(TTF_Font * xFont) const
     {
         if(xFont)
             TTF_CloseFont(xFont);
@@ -42,7 +42,7 @@ struct SDLTTFFontDeleter
 
 struct SDLTextureDeleter
 {
-    void operator()(SDL_Texture *xTexture)
+    void operator()(SDL_Texture *xTexture) const
     {
         if(xTexture)
             SDL_DestroyTexture(xTexture);

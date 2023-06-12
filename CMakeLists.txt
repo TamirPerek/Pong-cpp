@@ -41,17 +41,19 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(SDL SDL_TTF fmt)
 
-# set(SDL_LIBRARIES ${SDL_LIBRARIES} SDL2main SDL2-static SDL2_ttf)
-# target_include_directories("${PROJECT_NAME}" PRIVATE include)
-
-# target_link_libraries("${PROJECT_NAME}" PRIVATE ${SDL_LIBRARIES})
-
-# find_package(SDL2 REQUIRED)
-# include_directories(${SDL2_INCLUDE_DIRS})
-
 add_executable(
     ${PROJECT_NAME}
-    pong.cpp
+    src/Pong.cpp
+    src/SDLElements.h
+    src/WindowSize.h
+    src/UIElements/UIElement.h
+    src/UIElements/UIElement.cpp
+    src/UIElements/Player.h
+    src/UIElements/Player.cpp
+    src/UIElements/Ball.h
+    src/UIElements/Ball.cpp
+    src/UIElements/Points.h
+    src/UIElements/Points.cpp
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
