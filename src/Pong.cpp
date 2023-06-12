@@ -80,7 +80,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 		}
 
 		if (tKeyPressed.at(SDLK_ESCAPE))
-			isquit = true;
+		{
+			// isquit = true;
+			tUIElements.clear();
+			tUIElements = CreateElements(tWindowSize, tKeyPressed);
+		}
 
 		tWindowSize = WindowSize{ *window };
 
