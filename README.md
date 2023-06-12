@@ -9,5 +9,4 @@ The original version was written in C for SDL1 and a educational C IDE called Vi
 I converted the hole code to C++ with CMake and SDL3.
 But it is stil a lot to do ;)
 
-TODO:
-* [ ] Refactor code!!!!
+This repo is free for all, but some content may not. Please take a look at the asset folder first.
