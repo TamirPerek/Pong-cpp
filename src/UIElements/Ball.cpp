@@ -70,7 +70,7 @@ Ball& Ball::render(SDL_Renderer& xRenderer) noexcept
 
 void Ball::Resett() noexcept
 {
-	static auto tGen{ std::bind_front(std::uniform_int_distribution<>(0, 1), std::default_random_engine()) };
+	static auto tGen{ std::bind(std::uniform_int_distribution<>(0, 1), std::default_random_engine()) };
 
 	mRect.x = mWindowSize.w / 2;
 	mRect.y = mWindowSize.h / 2;

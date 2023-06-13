@@ -16,27 +16,27 @@
 #include <algorithm>
 #include <stdexcept>
 
-static inline std::vector<std::shared_ptr<UIElement>> CreateElements(const WindowSize& xWindowSize, std::map<int, bool>& xKeysPressed) noexcept(false)
+static inline std::vector<std::shared_ptr<UIElement>> CreateElements(const WindowSize &xWindowSize, std::map<int, bool> &xKeysPressed) noexcept(false)
 {
 	std::vector<std::shared_ptr<UIElement>> tResult;
 
-    std::shared_ptr<UIElement> tField{ std::make_shared<Field>() };
+	std::shared_ptr<UIElement> tField{std::make_shared<Field>()};
 
-	std::shared_ptr<UIElement> tMiddleLine{ std::make_shared<MiddleLine>(xWindowSize) };
-	tMiddleLine->mRect.x = (xWindowSize.w/2) - (tMiddleLine->mRect.w / 2);
+	std::shared_ptr<UIElement> tMiddleLine{std::make_shared<MiddleLine>(xWindowSize)};
+	tMiddleLine->mRect.x = (xWindowSize.w / 2) - (tMiddleLine->mRect.w / 2);
 
-	std::shared_ptr<UIElement> tPlayerOne{ std::make_shared<Player>(xWindowSize, xKeysPressed, SDLK_UP, SDLK_DOWN) };
+	std::shared_ptr<UIElement> tPlayerOne{std::make_shared<Player>(xWindowSize, xKeysPressed, SDLK_UP, SDLK_DOWN)};
 	tPlayerOne->mRect.x = xWindowSize.w - (tPlayerOne->mRect.w * 2);
 	tPlayerOne->mRect.y = (xWindowSize.h / 2) - (tPlayerOne->mRect.h / 2);
 
-	std::shared_ptr<UIElement> tPlayerTwo{ std::make_shared<Player>(xWindowSize, xKeysPressed, SDLK_w, SDLK_s) };
+	std::shared_ptr<UIElement> tPlayerTwo{std::make_shared<Player>(xWindowSize, xKeysPressed, SDLK_w, SDLK_s)};
 	tPlayerTwo->mRect.x = tPlayerTwo->mRect.w;
 	tPlayerTwo->mRect.y = (xWindowSize.h / 2) - (tPlayerTwo->mRect.h / 2);
 
-	std::shared_ptr<UIElement> tPoints{ std::make_shared<Points>(xWindowSize) };
+	std::shared_ptr<UIElement> tPoints{std::make_shared<Points>(xWindowSize)};
 	tPoints->mRect.x = (xWindowSize.w / 2) - (tPoints->mRect.w / 2);
 
-	std::shared_ptr<UIElement> tBall{ std::make_shared<Ball>(xWindowSize, tPlayerOne, tPlayerTwo, std::static_pointer_cast<Points>(tPoints)) };
+	std::shared_ptr<UIElement> tBall{std::make_shared<Ball>(xWindowSize, tPlayerOne, tPlayerTwo, std::static_pointer_cast<Points>(tPoints))};
 
 	tResult.emplace_back(std::move(tField));
 	tResult.emplace_back(std::move(tMiddleLine));
@@ -62,19 +62,19 @@ int Game::Start() noexcept
 	{
 		InitSDL();
 
-		unique_window_t window{ SDL_CreateWindow("Pong", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1028, 720, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI) };
-		unique_renderer_t tRenderer{ SDL_CreateRenderer(window.get(), -1, 0U) };
+		unique_window_t window{SDL_CreateWindow("Pong", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1028, 720, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI)};
+		unique_renderer_t tRenderer{SDL_CreateRenderer(window.get(), -1, 0U)};
 
-		WindowSize tWindowSize{ *window };
+		WindowSize tWindowSize{*window};
 
-		std::map<int, bool> tKeyPressed{ {SDLK_UP, false}, {SDLK_DOWN, false}, {SDLK_w, false}, {SDLK_s, false}, {SDLK_ESCAPE, false} };
+		std::map<int, bool> tKeyPressed{{SDLK_UP, false}, {SDLK_DOWN, false}, {SDLK_w, false}, {SDLK_s, false}, {SDLK_ESCAPE, false}};
 
-		auto tUIElements{ CreateElements(tWindowSize, tKeyPressed) };
+		auto tUIElements{CreateElements(tWindowSize, tKeyPressed)};
 
 		bool isquit = false;
 		SDL_Event event;
 
-		bool run{ true };
+		bool run{true};
 
 		while (!isquit)
 		{
@@ -104,16 +104,16 @@ int Game::Start() noexcept
 				tUIElements = CreateElements(tWindowSize, tKeyPressed);
 			}
 
-			tWindowSize = WindowSize{ *window };
+			tWindowSize = WindowSize{*window};
 
 			SDL_SetRenderDrawColor(tRenderer.get(), 66, 66, 66, 255);
 			SDL_RenderClear(tRenderer.get());
 
-			std::ranges::for_each(tUIElements, [&tWindowSize, &tRenderer](auto& xUIElement)
-				{
-					xUIElement->update(tWindowSize)
-						.render(*tRenderer); 
-				});
+			for (auto &tUIElement : tUIElements)
+			{
+				tUIElement->update(tWindowSize)
+					.render(*tRenderer);
+			}
 
 			SDL_RenderPresent(tRenderer.get());
 
@@ -125,7 +125,7 @@ int Game::Start() noexcept
 
 		return EXIT_SUCCESS;
 	}
-	catch (const std::exception& e)
+	catch (const std::exception &e)
 	{
 		fmt::print("Fatal Error: {}\n", e.what());
 		return EXIT_FAILURE;
