@@ -54,6 +54,8 @@ Ball& Ball::update(const WindowSize& xWindowSize) noexcept
 	mRect.h = (mRect.h * xWindowSize.h) / mWindowSize.h;
 	mRect.x = (mRect.x * xWindowSize.w) / mWindowSize.w;
 	mRect.y = (mRect.y * xWindowSize.h) / mWindowSize.h;
+	mXSpeed = (mXSpeed * xWindowSize.w) / mWindowSize.w;
+	mYSpeed = (mYSpeed * xWindowSize.h) / mWindowSize.h;
 
 	mWindowSize = xWindowSize;
 
@@ -74,6 +76,6 @@ void Ball::Resett() noexcept
 
 	mRect.x = mWindowSize.w / 2;
 	mRect.y = mWindowSize.h / 2;
-	mXSpeed = mXSpeed < 0.0 ? 2.0 : -2.0;
-	mYSpeed = tGen() != 0 ? -1.0 : 1.0;
+	mXSpeed = (mXSpeed < 0.0 ? 2.0 : -2.0) * mWindowSize.wRatio;
+	mYSpeed = (tGen() != 0 ? -1.0 : 1.0) * mWindowSize.hRatio;
 }
