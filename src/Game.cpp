@@ -106,9 +106,6 @@ int Game::Start() noexcept
 
 			tWindowSize = WindowSize{*window};
 
-			SDL_SetRenderDrawColor(tRenderer.get(), 66, 66, 66, 255);
-			SDL_RenderClear(tRenderer.get());
-
 			for (auto &tUIElement : tUIElements)
 			{
 				tUIElement->update(tWindowSize)
