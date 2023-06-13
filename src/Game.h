@@ -4,9 +4,6 @@
 #include <vector>
 #include <memory>
 
-class WindowSize;
-class UIElement;
-
 class Game
 {
 public:
