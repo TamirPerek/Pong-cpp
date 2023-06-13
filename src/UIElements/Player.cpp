@@ -1,7 +1,7 @@
 #include "Player.h"
 
 Player::Player(const WindowSize& xWindowSize, std::map<int, bool>& xKeysPressed, int xButtonUp, int xButtonDown)
-	: UIElement{ SDL_Rect{0, 0, xWindowSize.w / 50, xWindowSize.h / 4} },
+	: UIElement{ SDL_Rect{0, 0, static_cast<int>(xWindowSize.w / (30 * xWindowSize.wRatio)), static_cast<int>(xWindowSize.h / 4)} },
 	mWindowSize{ xWindowSize },
 	mKeysPressed{ xKeysPressed },
 	mButtonUp{ xButtonUp },
