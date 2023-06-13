@@ -1,7 +1,7 @@
 #include "MiddleLine.h"
 
 MiddleLine::MiddleLine(const WindowSize &xWindowSize)
-    : UIElement{SDL_Rect{0,0, static_cast<int>((xWindowSize.w / 80) * xWindowSize.wRatio), xWindowSize.h}},
+    : UIElement{SDL_Rect{0,0, static_cast<int>(xWindowSize.w / (80 * xWindowSize.wRatio)), xWindowSize.h}},
       mWindowSize{xWindowSize}
 {
 }
