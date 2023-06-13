@@ -5,7 +5,7 @@
 #include <cassert>
 
 Ball::Ball(const WindowSize& xWindowSize, const std::shared_ptr<UIElement>& xPlayerOne, const std::shared_ptr<UIElement>& xPlayerTwo, std::shared_ptr<Points> xPoints)
-	: UIElement{ SDL_Rect{0, 0, static_cast<int>((xWindowSize.h / 50) * xWindowSize.hRatio), static_cast<int>((xWindowSize.h / 50) * xWindowSize.hRatio)} },
+	: UIElement{ SDL_Rect{0, 0, static_cast<int>(xWindowSize.h / (30 * xWindowSize.hRatio)), static_cast<int>(xWindowSize.h / (30 * xWindowSize.hRatio))} },
 	mWindowSize{ xWindowSize },
 	mPlayerOne{ xPlayerOne },
 	mPlayerTwo{ xPlayerTwo },
