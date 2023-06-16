@@ -1,8 +1,8 @@
 #pragma once
 
-#include "UIElement.h"
+#include "UIBaseElement.h"
 
-class MiddleLine : public UIElement
+class MiddleLine : public UIBaseElement
 {
 public:
     WindowSize mWindowSize;
@@ -10,6 +10,6 @@ public:
     explicit MiddleLine(const WindowSize &xWindowSize);
     ~MiddleLine() final = default;
 
-    MiddleLine &update(const WindowSize &xWindowSize) noexcept final;
-    MiddleLine &render(SDL_Renderer &xRenderer) noexcept final;
+    static void update(MiddleLine &, const WindowSize &xWindowSize) noexcept;
+    static void render(MiddleLine &, SDL_Renderer &xRenderer) noexcept;
 };

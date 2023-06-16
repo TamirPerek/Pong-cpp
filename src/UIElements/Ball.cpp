@@ -4,8 +4,8 @@
 #include <functional>
 #include <cassert>
 
-Ball::Ball(const WindowSize& xWindowSize, const std::shared_ptr<UIElement>& xPlayerOne, const std::shared_ptr<UIElement>& xPlayerTwo, std::shared_ptr<Points> xPoints)
-	: UIElement{ SDL_Rect{0, 0, static_cast<int>(xWindowSize.h / (30 * xWindowSize.hRatio)), static_cast<int>(xWindowSize.h / (30 * xWindowSize.hRatio))} },
+Ball::Ball(const WindowSize& xWindowSize, const Player& xPlayerOne, const Player& xPlayerTwo, Points& xPoints)
+	: UIBaseElement{ SDL_Rect{0, 0, static_cast<int>(xWindowSize.h / (30 * xWindowSize.hRatio)), static_cast<int>(xWindowSize.h / (30 * xWindowSize.hRatio))} },
 	mWindowSize{ xWindowSize },
 	mPlayerOne{ xPlayerOne },
 	mPlayerTwo{ xPlayerTwo },
@@ -14,60 +14,56 @@ Ball::Ball(const WindowSize& xWindowSize, const std::shared_ptr<UIElement>& xPla
 	Resett();
 }
 
-Ball& Ball::update(const WindowSize& xWindowSize) noexcept
+void Ball::update(Ball &xBall, const WindowSize& xWindowSize) noexcept
 {
-	if (mXSpeed > 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(*this), static_cast<const SDL_Rect*>(*mPlayerOne)) == SDL_TRUE)
-		mXSpeed *= -1.0;
+	if (xBall.mXSpeed > 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(xBall), static_cast<const SDL_Rect*>(xBall.mPlayerOne)) == SDL_TRUE)
+		xBall.mXSpeed *= -1.0;
 
-	if (mXSpeed < 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(*this), static_cast<const SDL_Rect*>(*mPlayerTwo)) == SDL_TRUE)
-		mXSpeed *= -1.0;
+	if (xBall.mXSpeed < 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(xBall), static_cast<const SDL_Rect*>(xBall.mPlayerTwo)) == SDL_TRUE)
+		xBall.mXSpeed *= -1.0;
 
-	if (mRect.y < 0 || mRect.y + mRect.h > mWindowSize.h)
-		mYSpeed *= -1.0;
+	if (xBall.mRect.y < 0 || xBall.mRect.y + xBall.mRect.h > xBall.mWindowSize.h)
+		xBall.mYSpeed *= -1.0;
 
-	mRect.x += static_cast<int>(mXSpeed * xWindowSize.wRatio);
-	mRect.y += static_cast<int>(mYSpeed * mWindowSize.hRatio);
-	mXSpeed *= mForce;
-	mYSpeed *= mForce;
+	xBall.mRect.x += static_cast<int>(xBall.mXSpeed * xWindowSize.wRatio);
+	xBall.mRect.y += static_cast<int>(xBall.mYSpeed * xBall.mWindowSize.hRatio);
+	xBall.mXSpeed *= xBall.mForce;
+	xBall.mYSpeed *= xBall.mForce;
 
 	// Points
-	if (mRect.x + mRect.w < 0)
+	if (xBall.mRect.x + xBall.mRect.w < 0)
 	{
-		Resett();
-		++mPoints->mValueTwo;
+		xBall.Resett();
+		++xBall.mPoints.mValueTwo;
 		// if (mPoints->mValueTwo == 9)
 		// 	run = false;
 	}
 
-	if (mRect.x > mWindowSize.w)
+	if (xBall.mRect.x > xBall.mWindowSize.w)
 	{
-		Resett();
-		++mPoints->mValueOne;
+		xBall.Resett();
+		++xBall.mPoints.mValueOne;
 		// if (mPoints->mValueOne == 9)
 		// 	run = false;
 	}
 
-	if (xWindowSize == mWindowSize)
-		return *this;
+	if (xWindowSize == xBall.mWindowSize)
+		return ;
 
-	mRect.w = (mRect.h * xWindowSize.h) / mWindowSize.h;
-	mRect.h = (mRect.h * xWindowSize.h) / mWindowSize.h;
-	mRect.x = (mRect.x * xWindowSize.w) / mWindowSize.w;
-	mRect.y = (mRect.y * xWindowSize.h) / mWindowSize.h;
-	mXSpeed = (mXSpeed * xWindowSize.w) / mWindowSize.w;
-	mYSpeed = (mYSpeed * xWindowSize.h) / mWindowSize.h;
+	xBall.mRect.w = (xBall.mRect.h * xWindowSize.h) / xBall.mWindowSize.h;
+	xBall.mRect.h = (xBall.mRect.h * xWindowSize.h) / xBall.mWindowSize.h;
+	xBall.mRect.x = (xBall.mRect.x * xWindowSize.w) / xBall.mWindowSize.w;
+	xBall.mRect.y = (xBall.mRect.y * xWindowSize.h) / xBall.mWindowSize.h;
+	xBall.mXSpeed = (xBall.mXSpeed * xWindowSize.w) / xBall.mWindowSize.w;
+	xBall.mYSpeed = (xBall.mYSpeed * xWindowSize.h) / xBall.mWindowSize.h;
 
-	mWindowSize = xWindowSize;
-
-	return *this;
+	xBall.mWindowSize = xWindowSize;
 }
 
-Ball& Ball::render(SDL_Renderer& xRenderer) noexcept
+void Ball::render(Ball &xBall, SDL_Renderer& xRenderer) noexcept
 {
 	SDL_SetRenderDrawColor(&xRenderer, 255, 255, 255, 255);
-	SDL_RenderFillRect(&xRenderer, static_cast<const SDL_Rect*>(*this));
-
-	return *this;
+	SDL_RenderFillRect(&xRenderer, static_cast<const SDL_Rect*>(xBall));
 }
 
 void Ball::Resett() noexcept

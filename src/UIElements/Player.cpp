@@ -1,7 +1,7 @@
 #include "Player.h"
 
 Player::Player(const WindowSize& xWindowSize, std::map<int, bool>& xKeysPressed, int xButtonUp, int xButtonDown)
-	: UIElement{ SDL_Rect{0, 0, static_cast<int>(xWindowSize.w / (30 * xWindowSize.wRatio)), static_cast<int>(xWindowSize.h / 4)} },
+	: UIBaseElement{ SDL_Rect{0, 0, static_cast<int>(xWindowSize.w / (30 * xWindowSize.wRatio)), static_cast<int>(xWindowSize.h / 4)} },
 	mWindowSize{ xWindowSize },
 	mKeysPressed{ xKeysPressed },
 	mButtonUp{ xButtonUp },
@@ -9,30 +9,26 @@ Player::Player(const WindowSize& xWindowSize, std::map<int, bool>& xKeysPressed,
 {
 }
 
-Player& Player::update(const WindowSize& xWindowSize) noexcept
+void Player::update(Player &xPlayer, const WindowSize& xWindowSize) noexcept
 {
-	if (mKeysPressed.at(mButtonUp) && mRect.y > 0)
-		mRect.y -= static_cast<int>(5 * mWindowSize.hRatio);
-	if (mKeysPressed.at(mButtonDown) && mRect.y + mRect.h < mWindowSize.h)
-		mRect.y += static_cast<int>(5 * mWindowSize.hRatio);
+	if (xPlayer.mKeysPressed.get().at(xPlayer.mButtonUp) && xPlayer.mRect.y > 0)
+		xPlayer.mRect.y -= static_cast<int>(5 * xPlayer.mWindowSize.hRatio);
+	if (xPlayer.mKeysPressed.get().at(xPlayer.mButtonDown) && xPlayer.mRect.y + xPlayer.mRect.h < xPlayer.mWindowSize.h)
+		xPlayer.mRect.y += static_cast<int>(5 * xPlayer.mWindowSize.hRatio);
 
-	if (xWindowSize == mWindowSize)
-		return *this;
+	if (xWindowSize == xPlayer.mWindowSize)
+		return;
 
-	mRect.w = (mRect.w * xWindowSize.w) / mWindowSize.w;
-	mRect.h = (mRect.h * xWindowSize.h) / mWindowSize.h;
-	mRect.x = (mRect.x * xWindowSize.w) / mWindowSize.w;
-	mRect.y = (mRect.y * xWindowSize.h) / mWindowSize.h;
+	xPlayer.mRect.w = (xPlayer.mRect.w * xWindowSize.w) / xPlayer.mWindowSize.w;
+	xPlayer.mRect.h = (xPlayer.mRect.h * xWindowSize.h) / xPlayer.mWindowSize.h;
+	xPlayer.mRect.x = (xPlayer.mRect.x * xWindowSize.w) / xPlayer.mWindowSize.w;
+	xPlayer.mRect.y = (xPlayer.mRect.y * xWindowSize.h) / xPlayer.mWindowSize.h;
 
-	mWindowSize = xWindowSize;
-
-	return *this;
+	xPlayer.mWindowSize = xWindowSize;
 }
 
-Player& Player::render(SDL_Renderer& xRenderer) noexcept
+void Player::render(Player &xPlayer, SDL_Renderer& xRenderer) noexcept
 {
 	SDL_SetRenderDrawColor(&xRenderer, 255, 255, 255, 255);
-	SDL_RenderFillRect(&xRenderer, static_cast<const SDL_Rect*>(*this));
-
-	return *this;
+	SDL_RenderFillRect(&xRenderer, static_cast<const SDL_Rect*>(xPlayer));
 }

@@ -6,32 +6,44 @@
 #include <iostream>
 
 Points::Points(const WindowSize& xWindowSize)
-	: UIElement{ SDL_Rect{0, 0, static_cast<int>(250 * xWindowSize.wRatio), static_cast<int>(100 * xWindowSize.hRatio)} },
+	: UIBaseElement{ SDL_Rect{0, 0, static_cast<int>(250 * xWindowSize.wRatio), static_cast<int>(100 * xWindowSize.hRatio)} },
 	mWindowSize{ xWindowSize }
 {
+	mFont.reset(TTF_OpenFont(mFontPath.data(), mFontSize));
+
 	if (!mFont)
 		throw std::runtime_error("Unable to load font");
 }
 
-Points& Points::update(const WindowSize& xWindowSize) noexcept
+Points::Points(const Points &xOther)
+: UIBaseElement{ xOther.mRect },
+	mWindowSize{ xOther.mWindowSize }
 {
-	if (mWindowSize == xWindowSize)
-		return *this;
+	mFont.reset(TTF_OpenFont(xOther.mFontPath.data(), xOther.mFontSize));
 
-	mRect.w = (mRect.w * xWindowSize.w) / mWindowSize.w;
-	mRect.h = (mRect.h * xWindowSize.h) / mWindowSize.h;
-	mRect.x = (mRect.x * xWindowSize.w) / mWindowSize.w;
-	mRect.y = (mRect.y * xWindowSize.h) / mWindowSize.h;
+	if (!mFont)
+		throw std::runtime_error("Unable to load font");
 
-	mWindowSize = xWindowSize;
-
-	return *this;
+	;
 }
 
-Points& Points::render(SDL_Renderer& xRenderer) noexcept
+void Points::update(Points &xPoints, const WindowSize& xWindowSize) noexcept
 {
-	auto tScore = fmt::format("{} : {}", mValueOne, mValueTwo);
-	unique_surface_t tMessageSurface{ TTF_RenderText_Solid(mFont.get(), tScore.c_str(), SDL_Color{255, 255, 255}) };
+	if (xPoints.mWindowSize == xWindowSize)
+		return;
+
+	xPoints.mRect.w = (xPoints.mRect.w * xWindowSize.w) / xPoints.mWindowSize.w;
+	xPoints.mRect.h = (xPoints.mRect.h * xWindowSize.h) / xPoints.mWindowSize.h;
+	xPoints.mRect.x = (xPoints.mRect.x * xWindowSize.w) / xPoints.mWindowSize.w;
+	xPoints.mRect.y = (xPoints.mRect.y * xWindowSize.h) / xPoints.mWindowSize.h;
+
+	xPoints.mWindowSize = xWindowSize;
+}
+
+void Points::render(Points &xPoints, SDL_Renderer& xRenderer) noexcept
+{
+	auto tScore = fmt::format("{} : {}",xPoints.mValueOne, xPoints.mValueTwo);
+	unique_surface_t tMessageSurface{ TTF_RenderText_Solid(xPoints.mFont.get(), tScore.c_str(), SDL_Color{255, 255, 255}) };
 	if (!tMessageSurface)
 	{
 		std::cerr << "Unable to render text\n";
@@ -41,12 +53,10 @@ Points& Points::render(SDL_Renderer& xRenderer) noexcept
 	if (!Message)
 	{
 		std::cerr << "Unable to create texture\n";
-		return *this;
+		return ;
 	}
 
-	if (SDL_RenderCopy(&xRenderer, Message.get(), nullptr, static_cast<const SDL_Rect*>(*this)) != 0)
+	if (SDL_RenderCopy(&xRenderer, Message.get(), nullptr, static_cast<const SDL_Rect*>(xPoints)) != 0)
 		std::cerr << "Unable to show points\n";
-
-	return *this;
 }
 

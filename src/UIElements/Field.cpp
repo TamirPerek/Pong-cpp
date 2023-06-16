@@ -1,19 +1,17 @@
 #include "Field.h"
 
 Field::Field()
-	: UIElement{ SDL_Rect{} }
+	: UIBaseElement{ SDL_Rect{} }
 {
 }
 
-Field& Field::update(const WindowSize& xWindowSize) noexcept
+void Field::update(Field &, [[maybe_unused]] const WindowSize& xWindowSize) noexcept
 {
-	return *this;
+	return;
 }
 
-Field& Field::render(SDL_Renderer& xRenderer) noexcept
+void Field::render(Field &, SDL_Renderer& xRenderer) noexcept
 {
 	SDL_SetRenderDrawColor(&xRenderer, 66, 66, 66, 255);
 	SDL_RenderClear(&xRenderer);
-
-	return *this;
 }

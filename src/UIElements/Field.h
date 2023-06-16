@@ -1,13 +1,15 @@
 #pragma once
 
-#include "UIElement.h"
+#include "UIBaseElement.h"
 
-class Field : public UIElement
+class Field : public UIBaseElement
 {
 public:
 	Field();
+	Field(const Field&) = default;
+	Field(Field&&) = default;
 	~Field() final = default;
 
-	Field& update(const WindowSize& xWindowSize) noexcept final;
-	Field& render(SDL_Renderer&) noexcept final;
+	static void update(Field &, const WindowSize& xWindowSize) noexcept;
+	static void render(Field &, SDL_Renderer&) noexcept;
 };

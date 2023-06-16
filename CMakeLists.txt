@@ -48,8 +48,10 @@ add_executable(
     src/Game.cpp
     src/SDLElements.h
     src/WindowSize.h
-    src/UIElements/UIElement.h
-    src/UIElements/UIElement.cpp
+    src/UIElements/UIBaseElement.h
+    src/UIElements/UIBaseElement.cpp
+    src/UIElements/UIFunctions.h
+    src/UIElements/UIFunctions.cpp
     src/UIElements/Player.h
     src/UIElements/Player.cpp
     src/UIElements/Ball.h

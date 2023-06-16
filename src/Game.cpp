@@ -2,11 +2,8 @@
 
 #include "SDLElements.h"
 #include "WindowSize.h"
-#include "UIElements/Player.h"
-#include "UIElements/Points.h"
-#include "UIElements/Ball.h"
 #include "UIElements/Field.h"
-#include "UIElements/MiddleLine.h"
+#include "UIElements/UIFunctions.h"
 
 #include <SDL_ttf.h>
 #include <SDL.h>
@@ -16,34 +13,34 @@
 #include <algorithm>
 #include <stdexcept>
 
-static inline std::vector<std::shared_ptr<UIElement>> CreateElements(const WindowSize &xWindowSize, std::map<int, bool> &xKeysPressed) noexcept(false)
+static inline std::vector<UIElement> CreateElements(const WindowSize &xWindowSize, std::map<int, bool> &xKeysPressed) noexcept(false)
 {
-	std::vector<std::shared_ptr<UIElement>> tResult;
+	std::vector<UIElement> tResult;
 
-	std::shared_ptr<UIElement> tField{std::make_shared<Field>()};
+	Field tField;
 
-	std::shared_ptr<UIElement> tMiddleLine{std::make_shared<MiddleLine>(xWindowSize)};
-	tMiddleLine->mRect.x = (xWindowSize.w / 2) - (tMiddleLine->mRect.w / 2);
+	MiddleLine tMiddleLine{xWindowSize};
+	tMiddleLine.mRect.x = (xWindowSize.w / 2) - (tMiddleLine.mRect.w / 2);
 
-	std::shared_ptr<UIElement> tPlayerOne{std::make_shared<Player>(xWindowSize, xKeysPressed, SDLK_UP, SDLK_DOWN)};
-	tPlayerOne->mRect.x = xWindowSize.w - (tPlayerOne->mRect.w * 2);
-	tPlayerOne->mRect.y = (xWindowSize.h / 2) - (tPlayerOne->mRect.h / 2);
+	Player tPlayerOne{xWindowSize, xKeysPressed, SDLK_UP, SDLK_DOWN};
+	tPlayerOne.mRect.x = xWindowSize.w - (tPlayerOne.mRect.w * 2);
+	tPlayerOne.mRect.y = (xWindowSize.h / 2) - (tPlayerOne.mRect.h / 2);
 
-	std::shared_ptr<UIElement> tPlayerTwo{std::make_shared<Player>(xWindowSize, xKeysPressed, SDLK_w, SDLK_s)};
-	tPlayerTwo->mRect.x = tPlayerTwo->mRect.w;
-	tPlayerTwo->mRect.y = (xWindowSize.h / 2) - (tPlayerTwo->mRect.h / 2);
+	Player tPlayerTwo{xWindowSize, xKeysPressed, SDLK_w, SDLK_s};
+	tPlayerTwo.mRect.x = tPlayerTwo.mRect.w;
+	tPlayerTwo.mRect.y = (xWindowSize.h / 2) - (tPlayerTwo.mRect.h / 2);
 
-	std::shared_ptr<UIElement> tPoints{std::make_shared<Points>(xWindowSize)};
-	tPoints->mRect.x = (xWindowSize.w / 2) - (tPoints->mRect.w / 2);
+	Points tPoints{xWindowSize};
+	tPoints.mRect.x = (xWindowSize.w / 2) - (tPoints.mRect.w / 2);
 
-	std::shared_ptr<UIElement> tBall{std::make_shared<Ball>(xWindowSize, tPlayerOne, tPlayerTwo, std::static_pointer_cast<Points>(tPoints))};
+	Ball tBall{xWindowSize, tPlayerOne, tPlayerTwo, tPoints};
 
 	tResult.emplace_back(std::move(tField));
 	tResult.emplace_back(std::move(tMiddleLine));
 	tResult.emplace_back(std::move(tPlayerOne));
 	tResult.emplace_back(std::move(tPlayerTwo));
-	tResult.emplace_back(std::move(tBall));
 	tResult.emplace_back(std::move(tPoints));
+	tResult.emplace_back(std::move(tBall));
 
 	return tResult;
 }
@@ -108,8 +105,8 @@ int Game::Start() noexcept
 
 			for (auto &tUIElement : tUIElements)
 			{
-				tUIElement->update(tWindowSize)
-					.render(*tRenderer);
+				UIFunctions::Update(tUIElement, tWindowSize);
+				UIFunctions::Render(tUIElement, *tRenderer);
 			}
 
 			SDL_RenderPresent(tRenderer.get());
