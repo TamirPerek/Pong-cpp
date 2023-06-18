@@ -1,5 +1,6 @@
 #include "Game.h"
 
+#include "Configure.h"
 #include "SDLElements.h"
 #include "WindowSize.h"
 #include "UIElements/Field.h"
@@ -8,38 +9,47 @@
 #include <SDL_ttf.h>
 #include <SDL.h>
 
+#ifdef SUPPORT_STD_FORMAT_LIB
+#include <format>
+#else
 #include <fmt/format.h>
+#endif
 
+#include <iostream>
 #include <algorithm>
 #include <stdexcept>
+
+#ifdef TEST_THING
+std::cout << "Hello";
+#endif
 
 static inline std::vector<UIElement> CreateElements(const WindowSize &xWindowSize, std::map<int, bool> &xKeysPressed) noexcept(false)
 {
 	std::vector<UIElement> tResult;
 
 	Field tField;
+	tResult.emplace_back(std::move(tField));
 
 	MiddleLine tMiddleLine{xWindowSize};
 	tMiddleLine.mRect.x = (xWindowSize.w / 2) - (tMiddleLine.mRect.w / 2);
+	tResult.emplace_back(std::move(tMiddleLine));
 
 	Player tPlayerOne{xWindowSize, xKeysPressed, SDLK_UP, SDLK_DOWN};
 	tPlayerOne.mRect.x = xWindowSize.w - (tPlayerOne.mRect.w * 2);
 	tPlayerOne.mRect.y = (xWindowSize.h / 2) - (tPlayerOne.mRect.h / 2);
+	tResult.emplace_back(std::move(tPlayerOne));
 
 	Player tPlayerTwo{xWindowSize, xKeysPressed, SDLK_w, SDLK_s};
 	tPlayerTwo.mRect.x = tPlayerTwo.mRect.w;
 	tPlayerTwo.mRect.y = (xWindowSize.h / 2) - (tPlayerTwo.mRect.h / 2);
+	tResult.emplace_back(std::move(tPlayerTwo));
 
 	Points tPoints{xWindowSize};
 	tPoints.mRect.x = (xWindowSize.w / 2) - (tPoints.mRect.w / 2);
-
-	Ball tBall{xWindowSize, tPlayerOne, tPlayerTwo, tPoints};
-
-	tResult.emplace_back(std::move(tField));
-	tResult.emplace_back(std::move(tMiddleLine));
-	tResult.emplace_back(std::move(tPlayerOne));
-	tResult.emplace_back(std::move(tPlayerTwo));
 	tResult.emplace_back(std::move(tPoints));
+
+	// Because std::variant copys
+	Ball tBall{xWindowSize, std::get<Player>(tResult.at(2)), std::get<Player>(tResult.at(3)), std::get<Points>(tResult.at(4))};
 	tResult.emplace_back(std::move(tBall));
 
 	return tResult;
@@ -121,7 +131,11 @@ int Game::Start() noexcept
 	}
 	catch (const std::exception &e)
 	{
-		fmt::print("Fatal Error: {}\n", e.what());
+#ifdef SUPPORT_STD_FORMAT_LIB
+		std::cerr << std::format("Fatal Error: {}\n", e.what());
+#else
+		std::cerr << fmt::format("Fatal Error: {}\n", e.what());
+#endif
 		return EXIT_FAILURE;
 	}
 }

@@ -1,6 +1,12 @@
 #include "Points.h"
 
+#include "Configure.h"
+
+#ifdef SUPPORT_STD_FORMAT_LIB
+#include <format>
+#else
 #include <fmt/format.h>
+#endif
 
 #include <cassert>
 #include <iostream>
@@ -42,7 +48,12 @@ void Points::update(Points &xPoints, const WindowSize& xWindowSize) noexcept
 
 void Points::render(Points &xPoints, SDL_Renderer& xRenderer) noexcept
 {
-	auto tScore = fmt::format("{} : {}",xPoints.mValueOne, xPoints.mValueTwo);
+#ifdef SUPPORT_STD_FORMAT_LIB
+	auto tScore = std::format("{} : {}", xPoints.mValueOne, xPoints.mValueTwo);
+#else
+	auto tScore = fmt::format("{} : {}", xPoints.mValueOne, xPoints.mValueTwo);
+#endif
+
 	unique_surface_t tMessageSurface{ TTF_RenderText_Solid(xPoints.mFont.get(), tScore.c_str(), SDL_Color{255, 255, 255}) };
 	if (!tMessageSurface)
 	{
