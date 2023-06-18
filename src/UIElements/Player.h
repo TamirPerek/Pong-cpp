@@ -1,14 +1,15 @@
 #pragma once
 
-#include "UIElement.h"
+#include "UIBaseElement.h"
 
 #include <map>
+#include <functional>
 
-class Player : public UIElement
+class Player : public UIBaseElement
 {
 public:
 	WindowSize mWindowSize;
-	std::map<int, bool>& mKeysPressed;
+	std::reference_wrapper<std::map<int, bool>> mKeysPressed;
 	int mButtonUp{ 0 };
 	int mButtonDown{ 0 };
 
@@ -16,6 +17,6 @@ public:
 
 	~Player() final = default;
 
-	Player& update(const WindowSize& xWindowSize) noexcept final;
-	Player& render(SDL_Renderer&) noexcept final;
+	static void update(Player &, const WindowSize& xWindowSize) noexcept;
+	static void render(Player &, SDL_Renderer&) noexcept;
 };

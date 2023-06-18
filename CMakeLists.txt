@@ -10,6 +10,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include(FetchContent)
+include(CheckIncludeFileCXX)
+
+## Compile feature checks
+CHECK_INCLUDE_FILE_CXX("format" SUPPORT_STD_FORMAT_LIB)
+message(STATUS "CXX_FORMAT_SUPPORT: ${CXX_FORMAT_SUPPORT}")
 
 # sdl2
 FetchContent_Declare(
@@ -23,6 +28,7 @@ set(SDL2TTF_SAMPLES OFF CACHE BOOL "" FORCE)
 set(SDL2TTF_INSTALL OFF CACHE BOOL "" FORCE)
 set(SDL2_DISABLE_INSTALL OFF CACHE BOOL "" FORCE)
 
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 # sdl_ttf
 FetchContent_Declare(
     SDL_TTF
@@ -32,14 +38,20 @@ FetchContent_Declare(
 )
 
 # fmt
-FetchContent_Declare(
-    fmt
-    GIT_REPOSITORY  https://github.com/fmtlib/fmt.git
-    GIT_TAG         10.0.0
-    GIT_PROGRESS    TRUE
-)
+if(NOT SUPPORT_STD_FORMAT_LIB)
+message("Fetch fmt lib")
+    FetchContent_Declare(
+        fmt
+        GIT_REPOSITORY  https://github.com/fmtlib/fmt.git
+        GIT_TAG         10.0.0
+        GIT_PROGRESS    TRUE
+    )
+    FetchContent_MakeAvailable(fmt)
+endif()
 
-FetchContent_MakeAvailable(SDL SDL_TTF fmt)
+FetchContent_MakeAvailable(SDL SDL_TTF)
+
+configure_file( src/Configure.h.in Configure.h )
 
 add_executable(
     ${PROJECT_NAME}
@@ -48,8 +60,10 @@ add_executable(
     src/Game.cpp
     src/SDLElements.h
     src/WindowSize.h
-    src/UIElements/UIElement.h
-    src/UIElements/UIElement.cpp
+    src/UIElements/UIBaseElement.h
+    src/UIElements/UIBaseElement.cpp
+    src/UIElements/UIFunctions.h
+    src/UIElements/UIFunctions.cpp
     src/UIElements/Player.h
     src/UIElements/Player.cpp
     src/UIElements/Ball.h
@@ -67,11 +81,21 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 target_link_libraries(
     ${PROJECT_NAME}    
-    SDL2::SDL2
+    SDL2::SDL2-static
     SDL2::SDL2main
-    SDL2_ttf::SDL2_ttf
-    fmt::fmt
+    SDL2_ttf::SDL2_ttf-static
 )
+
+if(NOT SUPPORT_STD_FORMAT_LIB)
+    target_link_libraries(
+        ${PROJECT_NAME}    
+        fmt::fmt
+    )
+endif()
+
+target_include_directories(${PROJECT_NAME} 
+PUBLIC
+"${CMAKE_CURRENT_BINARY_DIR}")
 
 # standard compiler warnings
 include(cmake/CompilerWarnings.cmake)

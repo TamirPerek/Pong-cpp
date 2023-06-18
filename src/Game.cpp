@@ -1,49 +1,56 @@
 #include "Game.h"
 
+#include "Configure.h"
 #include "SDLElements.h"
 #include "WindowSize.h"
-#include "UIElements/Player.h"
-#include "UIElements/Points.h"
-#include "UIElements/Ball.h"
 #include "UIElements/Field.h"
-#include "UIElements/MiddleLine.h"
+#include "UIElements/UIFunctions.h"
 
 #include <SDL_ttf.h>
 #include <SDL.h>
 
+#ifdef SUPPORT_STD_FORMAT_LIB
+#include <format>
+#else
 #include <fmt/format.h>
+#endif
 
+#include <iostream>
 #include <algorithm>
 #include <stdexcept>
 
-static inline std::vector<std::shared_ptr<UIElement>> CreateElements(const WindowSize &xWindowSize, std::map<int, bool> &xKeysPressed) noexcept(false)
+#ifdef TEST_THING
+std::cout << "Hello";
+#endif
+
+static inline std::vector<UIElement> CreateElements(const WindowSize &xWindowSize, std::map<int, bool> &xKeysPressed) noexcept(false)
 {
-	std::vector<std::shared_ptr<UIElement>> tResult;
+	std::vector<UIElement> tResult;
 
-	std::shared_ptr<UIElement> tField{std::make_shared<Field>()};
-
-	std::shared_ptr<UIElement> tMiddleLine{std::make_shared<MiddleLine>(xWindowSize)};
-	tMiddleLine->mRect.x = (xWindowSize.w / 2) - (tMiddleLine->mRect.w / 2);
-
-	std::shared_ptr<UIElement> tPlayerOne{std::make_shared<Player>(xWindowSize, xKeysPressed, SDLK_UP, SDLK_DOWN)};
-	tPlayerOne->mRect.x = xWindowSize.w - (tPlayerOne->mRect.w * 2);
-	tPlayerOne->mRect.y = (xWindowSize.h / 2) - (tPlayerOne->mRect.h / 2);
-
-	std::shared_ptr<UIElement> tPlayerTwo{std::make_shared<Player>(xWindowSize, xKeysPressed, SDLK_w, SDLK_s)};
-	tPlayerTwo->mRect.x = tPlayerTwo->mRect.w;
-	tPlayerTwo->mRect.y = (xWindowSize.h / 2) - (tPlayerTwo->mRect.h / 2);
-
-	std::shared_ptr<UIElement> tPoints{std::make_shared<Points>(xWindowSize)};
-	tPoints->mRect.x = (xWindowSize.w / 2) - (tPoints->mRect.w / 2);
-
-	std::shared_ptr<UIElement> tBall{std::make_shared<Ball>(xWindowSize, tPlayerOne, tPlayerTwo, std::static_pointer_cast<Points>(tPoints))};
-
+	Field tField;
 	tResult.emplace_back(std::move(tField));
+
+	MiddleLine tMiddleLine{xWindowSize};
+	tMiddleLine.mRect.x = (xWindowSize.w / 2) - (tMiddleLine.mRect.w / 2);
 	tResult.emplace_back(std::move(tMiddleLine));
+
+	Player tPlayerOne{xWindowSize, xKeysPressed, SDLK_UP, SDLK_DOWN};
+	tPlayerOne.mRect.x = xWindowSize.w - (tPlayerOne.mRect.w * 2);
+	tPlayerOne.mRect.y = (xWindowSize.h / 2) - (tPlayerOne.mRect.h / 2);
 	tResult.emplace_back(std::move(tPlayerOne));
+
+	Player tPlayerTwo{xWindowSize, xKeysPressed, SDLK_w, SDLK_s};
+	tPlayerTwo.mRect.x = tPlayerTwo.mRect.w;
+	tPlayerTwo.mRect.y = (xWindowSize.h / 2) - (tPlayerTwo.mRect.h / 2);
 	tResult.emplace_back(std::move(tPlayerTwo));
-	tResult.emplace_back(std::move(tBall));
+
+	Points tPoints{xWindowSize};
+	tPoints.mRect.x = (xWindowSize.w / 2) - (tPoints.mRect.w / 2);
 	tResult.emplace_back(std::move(tPoints));
+
+	// Because std::variant copys
+	Ball tBall{xWindowSize, std::get<Player>(tResult.at(2)), std::get<Player>(tResult.at(3)), std::get<Points>(tResult.at(4))};
+	tResult.emplace_back(std::move(tBall));
 
 	return tResult;
 }
@@ -108,8 +115,8 @@ int Game::Start() noexcept
 
 			for (auto &tUIElement : tUIElements)
 			{
-				tUIElement->update(tWindowSize)
-					.render(*tRenderer);
+				UIFunctions::Update(tUIElement, tWindowSize);
+				UIFunctions::Render(tUIElement, *tRenderer);
 			}
 
 			SDL_RenderPresent(tRenderer.get());
@@ -124,7 +131,11 @@ int Game::Start() noexcept
 	}
 	catch (const std::exception &e)
 	{
-		fmt::print("Fatal Error: {}\n", e.what());
+#ifdef SUPPORT_STD_FORMAT_LIB
+		std::cerr << std::format("Fatal Error: {}\n", e.what());
+#else
+		std::cerr << fmt::format("Fatal Error: {}\n", e.what());
+#endif
 		return EXIT_FAILURE;
 	}
 }
