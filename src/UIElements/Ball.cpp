@@ -4,22 +4,22 @@
 #include <functional>
 #include <cassert>
 
-Ball::Ball(const WindowSize& xWindowSize, const Player& xPlayerOne, const Player& xPlayerTwo, Points& xPoints)
-	: UIBaseElement{ SDL_Rect{0, 0, static_cast<int>(xWindowSize.h / (30 * xWindowSize.hRatio)), static_cast<int>(xWindowSize.h / (30 * xWindowSize.hRatio))} },
-	mWindowSize{ xWindowSize },
-	mPlayerOne{ xPlayerOne },
-	mPlayerTwo{ xPlayerTwo },
-	mPoints{ xPoints }
+Ball::Ball(const WindowSize &xWindowSize, const std::reference_wrapper<Player> xPlayerOne, const std::reference_wrapper<Player> xPlayerTwo, std::reference_wrapper<Points> xPoints)
+	: UIBaseElement{SDL_Rect{0, 0, static_cast<int>(xWindowSize.h / (30 * xWindowSize.hRatio)), static_cast<int>(xWindowSize.h / (30 * xWindowSize.hRatio))}},
+	  mWindowSize{xWindowSize},
+	  mPlayerOne{xPlayerOne},
+	  mPlayerTwo{xPlayerTwo},
+	  mPoints{xPoints}
 {
 	Resett();
 }
 
 void Ball::update(Ball &xBall, const WindowSize& xWindowSize) noexcept
 {
-	if (xBall.mXSpeed > 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(xBall), static_cast<const SDL_Rect*>(xBall.mPlayerOne)) == SDL_TRUE)
+	if (xBall.mXSpeed > 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(xBall), static_cast<const SDL_Rect*>(xBall.mPlayerOne.get())) == SDL_TRUE)
 		xBall.mXSpeed *= -1.0;
 
-	if (xBall.mXSpeed < 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(xBall), static_cast<const SDL_Rect*>(xBall.mPlayerTwo)) == SDL_TRUE)
+	if (xBall.mXSpeed < 0 && SDL_HasIntersection(static_cast<const SDL_Rect*>(xBall), static_cast<const SDL_Rect*>(xBall.mPlayerTwo.get())) == SDL_TRUE)
 		xBall.mXSpeed *= -1.0;
 
 	if (xBall.mRect.y < 0 || xBall.mRect.y + xBall.mRect.h > xBall.mWindowSize.h)
@@ -34,7 +34,7 @@ void Ball::update(Ball &xBall, const WindowSize& xWindowSize) noexcept
 	if (xBall.mRect.x + xBall.mRect.w < 0)
 	{
 		xBall.Resett();
-		++xBall.mPoints.mValueTwo;
+		++xBall.mPoints.get().mValueTwo;
 		// if (mPoints->mValueTwo == 9)
 		// 	run = false;
 	}
@@ -42,7 +42,7 @@ void Ball::update(Ball &xBall, const WindowSize& xWindowSize) noexcept
 	if (xBall.mRect.x > xBall.mWindowSize.w)
 	{
 		xBall.Resett();
-		++xBall.mPoints.mValueOne;
+		++xBall.mPoints.get().mValueOne;
 		// if (mPoints->mValueOne == 9)
 		// 	run = false;
 	}

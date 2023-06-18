@@ -14,8 +14,6 @@ public:
 	explicit UIBaseElement(SDL_Rect&& xRect);
 
 	virtual ~UIBaseElement() = default;
-	// virtual UIBaseElement &update(const WindowSize& xWindowSize) noexcept = 0;
-	// virtual UIBaseElement &render(SDL_Renderer&) noexcept = 0;
 	explicit operator SDL_Rect const* () const;
 	explicit operator SDL_Rect* ();
 };
