@@ -72,6 +72,7 @@ void Ball::Resett() noexcept
 
 	mRect.x = mWindowSize.w / 2;
 	mRect.y = mWindowSize.h / 2;
+
 	mXSpeed = (mXSpeed < 0.0 ? 5.0 : -5.0) * mWindowSize.wRatio;
 	mYSpeed = (tGen() != 0 ? -2.0 : 2.0) * mWindowSize.hRatio;
 }
