@@ -13,12 +13,11 @@ public:
 	unique_font_t mFont;
 	unsigned int mValueOne{ 0U };
 	unsigned int mValueTwo{ 0U };
-	#if defined(__APPLE__)
+ #if defined(__APPLE__)
 	const std::filesystem::path mFontPath{"../Resources/assets/The Led Display St.ttf"};
-	#else
+#else
 	const std::filesystem::path mFontPath{std::filesystem::current_path() / "assets/The Led Display St.ttf"};
-	#endif
-	// const std::filesystem::path mFontPath{"/Users/nilsbrodner/Downloads/Icons for Pong/Pong.app/Contents/MacOS/assets/The Led Display St.ttf"};
+#endif
 	int mFontSize{72};
 
 	explicit Points(const WindowSize& xWindowSize);

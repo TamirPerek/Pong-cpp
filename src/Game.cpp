@@ -136,6 +136,7 @@ int Game::Start() noexcept
 #else
 		std::cerr << fmt::format("Fatal Error: {}\n", e.what());
 #endif
+    
 		SDL_Quit();
 		return EXIT_FAILURE;
 	}

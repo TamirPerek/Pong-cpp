@@ -21,8 +21,6 @@ Points::Points(const WindowSize& xWindowSize)
 	std::print("Font Path: {}\n", tFontPath.string());
 	if (std::error_code er; !std::filesystem::exists(tFontPath, er))
             throw std::runtime_error(std::format("file does not exist: {}, {}", tFontPath.string(), er.message()));
-	// if(!std::filesystem::exists(tFontPath))
-	// 	throw std::runtime_error(std::format("Font not found: {}", tFontPath.string()));
 
 	mFont.reset(TTF_OpenFont(tFontPath.string().c_str(), mFontSize));
 
