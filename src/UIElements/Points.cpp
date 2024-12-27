@@ -11,14 +11,12 @@
 #include <cassert>
 #include <iostream>
 #include <filesystem>
-#include <print>
 
 Points::Points(const WindowSize& xWindowSize)
 	: UIBaseElement{ SDL_Rect{0, 0, static_cast<int>(250 * xWindowSize.wRatio), static_cast<int>(100 * xWindowSize.hRatio)} },
 	mWindowSize{ xWindowSize }
 {
 	const auto tFontPath{mFontPath};
-	std::print("Font Path: {}\n", tFontPath.string());
 	if (std::error_code er; !std::filesystem::exists(tFontPath, er))
             throw std::runtime_error(std::format("file does not exist: {}, {}", tFontPath.string(), er.message()));
 
