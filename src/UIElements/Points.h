@@ -2,7 +2,7 @@
 
 #include "UIBaseElement.h"
 #include "../SDLElements.h"
-#include <SDL_ttf.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include <filesystem>
 

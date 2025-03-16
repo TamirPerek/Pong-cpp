@@ -20,7 +20,7 @@ message(STATUS "CXX_FORMAT_SUPPORT: ${CXX_FORMAT_SUPPORT}")
 FetchContent_Declare(
     SDL
     GIT_REPOSITORY  https://github.com/libsdl-org/SDL
-    GIT_TAG         release-2.30.10
+    GIT_TAG         release-3.2.8
     GIT_PROGRESS    TRUE
 )
 
@@ -33,7 +33,7 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     SDL_TTF
     GIT_REPOSITORY  https://github.com/libsdl-org/SDL_ttf
-    GIT_TAG         release-2.22.0
+    GIT_TAG         release-3.2.0
     GIT_PROGRESS    TRUE
 )
 
@@ -43,7 +43,7 @@ if(NOT SUPPORT_STD_FORMAT_LIB)
     FetchContent_Declare(
         fmt
         GIT_REPOSITORY  https://github.com/fmtlib/fmt.git
-        GIT_TAG         10.0.0
+        GIT_TAG         11.1.4
         GIT_PROGRESS    TRUE
     )
     FetchContent_MakeAvailable(fmt)
@@ -126,9 +126,11 @@ if(APPLE)
     
     target_link_libraries(
         ${PROJECT_NAME}    
-        SDL2::SDL2-static
-        SDL2::SDL2main
-        SDL2_ttf::SDL2_ttf-static
+        # SDL2::SDL2-static
+        # SDL2::SDL2main
+        # SDL2_ttf::SDL2_ttf-static
+        SDL3::SDL3  
+        SDL3_ttf::SDL3_ttf-static     
     )
     
     if(NOT SUPPORT_STD_FORMAT_LIB)
@@ -168,7 +170,7 @@ else()
 
     target_link_libraries(
         ${PROJECT_NAME}    
-        SDL2::SDL2-static
+        # SDL2::SDL2-static
         SDL2::SDL2main
         SDL2_ttf::SDL2_ttf-static
     )

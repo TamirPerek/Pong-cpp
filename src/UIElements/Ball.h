@@ -24,5 +24,5 @@ public:
 	static void update(Ball &, const WindowSize& xWindowSize) noexcept;
 	static void render(Ball &, SDL_Renderer&) noexcept;
 
-	void Resett() noexcept;
+	void Reset() noexcept;
 };
