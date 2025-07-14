@@ -1,7 +1,6 @@
 #pragma once
 
 #include "SDLElements.h"
-#include <SDL_rect.h>
 
 class WindowSize
 {
@@ -14,7 +13,7 @@ public:
     WindowSize() = default;
     explicit WindowSize(SDL_Window &xWindow)
     {
-        SDL_GL_GetDrawableSize(&xWindow, &w, &h);
+        SDL_GetWindowSizeInPixels(&xWindow, &w, &h);
         int tW{0};
         int tH{0};
         SDL_GetWindowSize(&xWindow, &tW, &tH);

@@ -1,7 +1,7 @@
 #include "Field.h"
 
 Field::Field()
-	: UIBaseElement{ SDL_Rect{} }
+	: UIBaseElement{ SDL_FRect{} }
 {
 }
 

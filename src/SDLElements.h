@@ -1,8 +1,8 @@
 #pragma once
-#include <SDL_video.h>
-#include <SDL_surface.h>
-#include <SDL_render.h>
-#include <SDL_ttf.h>
+#include <SDL3/SDL_video.h>
+#include <SDL3/SDL_surface.h>
+#include <SDL3/SDL_render.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <memory>
 
 struct SDLWindowDeleter
@@ -18,7 +18,7 @@ struct SDLSurfaceDeleter
     void operator()(SDL_Surface *xSurface) const
     {
         if (xSurface)
-            SDL_FreeSurface(xSurface);
+            SDL_DestroySurface(xSurface);
     }
 };
 

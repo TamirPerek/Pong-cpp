@@ -10,27 +10,30 @@
 
 #include <cassert>
 #include <iostream>
+#include <filesystem>
 
 Points::Points(const WindowSize& xWindowSize)
-	: UIBaseElement{ SDL_Rect{0, 0, static_cast<int>(250 * xWindowSize.wRatio), static_cast<int>(100 * xWindowSize.hRatio)} },
+	: UIBaseElement{ SDL_FRect{0, 0, static_cast<float>(250 * xWindowSize.wRatio), static_cast<float>(100 * xWindowSize.hRatio)} },
 	mWindowSize{ xWindowSize }
 {
-	mFont.reset(TTF_OpenFont(mFontPath.data(), mFontSize));
+	const auto tFontPath{mFontPath};
+	if (std::error_code er; !std::filesystem::exists(tFontPath, er))
+            throw std::runtime_error(std::format("file does not exist: {}, {}", tFontPath.string(), er.message()));
+
+	mFont.reset(TTF_OpenFont(tFontPath.string().c_str(), mFontSize));
 
 	if (!mFont)
-		throw std::runtime_error("Unable to load font");
+		throw std::runtime_error(std::format("Unable to load font: {}", tFontPath.string()));
 }
 
 Points::Points(const Points &xOther)
-: UIBaseElement{ xOther.mRect },
+: UIBaseElement{ xOther.mFRect },
 	mWindowSize{ xOther.mWindowSize }
 {
-	mFont.reset(TTF_OpenFont(xOther.mFontPath.data(), xOther.mFontSize));
+	mFont.reset(TTF_OpenFont(xOther.mFontPath.string().c_str(), xOther.mFontSize));
 
 	if (!mFont)
-		throw std::runtime_error("Unable to load font");
-
-	;
+		throw std::runtime_error(std::format("Unable to load font: {}", xOther.mFontPath.string()));
 }
 
 void Points::update(Points &xPoints, const WindowSize& xWindowSize) noexcept
@@ -38,10 +41,10 @@ void Points::update(Points &xPoints, const WindowSize& xWindowSize) noexcept
 	if (xPoints.mWindowSize == xWindowSize)
 		return;
 
-	xPoints.mRect.w = (xPoints.mRect.w * xWindowSize.w) / xPoints.mWindowSize.w;
-	xPoints.mRect.h = (xPoints.mRect.h * xWindowSize.h) / xPoints.mWindowSize.h;
-	xPoints.mRect.x = (xPoints.mRect.x * xWindowSize.w) / xPoints.mWindowSize.w;
-	xPoints.mRect.y = (xPoints.mRect.y * xWindowSize.h) / xPoints.mWindowSize.h;
+	xPoints.mFRect.w = (xPoints.mFRect.w * xWindowSize.w) / xPoints.mWindowSize.w;
+	xPoints.mFRect.h = (xPoints.mFRect.h * xWindowSize.h) / xPoints.mWindowSize.h;
+	xPoints.mFRect.x = (xPoints.mFRect.x * xWindowSize.w) / xPoints.mWindowSize.w;
+	xPoints.mFRect.y = (xPoints.mFRect.y * xWindowSize.h) / xPoints.mWindowSize.h;
 
 	xPoints.mWindowSize = xWindowSize;
 }
@@ -54,7 +57,7 @@ void Points::render(Points &xPoints, SDL_Renderer& xRenderer) noexcept
 	auto tScore = fmt::format("{} : {}", xPoints.mValueOne, xPoints.mValueTwo);
 #endif
 
-	unique_surface_t tMessageSurface{ TTF_RenderText_Solid(xPoints.mFont.get(), tScore.c_str(), SDL_Color{255, 255, 255}) };
+	unique_surface_t tMessageSurface{ TTF_RenderText_Solid(xPoints.mFont.get(), tScore.c_str(), tScore.size(), SDL_Color{255, 255, 255}) };
 	if (!tMessageSurface)
 	{
 		std::cerr << "Unable to render text\n";
@@ -67,7 +70,8 @@ void Points::render(Points &xPoints, SDL_Renderer& xRenderer) noexcept
 		return ;
 	}
 
-	if (SDL_RenderCopy(&xRenderer, Message.get(), nullptr, static_cast<const SDL_Rect*>(xPoints)) != 0)
+
+	if (!SDL_RenderTexture(&xRenderer, Message.get(), nullptr, static_cast<const SDL_FRect*>(xPoints)))
 		std::cerr << "Unable to show points\n";
 }
 

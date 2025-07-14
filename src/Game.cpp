@@ -6,8 +6,8 @@
 #include "UIElements/Field.h"
 #include "UIElements/UIFunctions.h"
 
-#include <SDL_ttf.h>
-#include <SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+#include <SDL3/SDL.h>
 
 #ifdef SUPPORT_STD_FORMAT_LIB
 #include <format>
@@ -31,24 +31,24 @@ static inline std::vector<UIElement> CreateElements(const WindowSize &xWindowSiz
 	tResult.emplace_back(std::move(tField));
 
 	MiddleLine tMiddleLine{xWindowSize};
-	tMiddleLine.mRect.x = (xWindowSize.w / 2) - (tMiddleLine.mRect.w / 2);
+	tMiddleLine.mFRect.x = (xWindowSize.w / 2) - (tMiddleLine.mFRect.w / 2);
 	tResult.emplace_back(std::move(tMiddleLine));
 
 	Player tPlayerOne{xWindowSize, xKeysPressed, SDLK_UP, SDLK_DOWN};
-	tPlayerOne.mRect.x = xWindowSize.w - (tPlayerOne.mRect.w * 2);
-	tPlayerOne.mRect.y = (xWindowSize.h / 2) - (tPlayerOne.mRect.h / 2);
+	tPlayerOne.mFRect.x = xWindowSize.w - (tPlayerOne.mFRect.w * 2);
+	tPlayerOne.mFRect.y = (xWindowSize.h / 2) - (tPlayerOne.mFRect.h / 2);
 	tResult.emplace_back(std::move(tPlayerOne));
 
-	Player tPlayerTwo{xWindowSize, xKeysPressed, SDLK_w, SDLK_s};
-	tPlayerTwo.mRect.x = tPlayerTwo.mRect.w;
-	tPlayerTwo.mRect.y = (xWindowSize.h / 2) - (tPlayerTwo.mRect.h / 2);
+	Player tPlayerTwo{xWindowSize, xKeysPressed, SDLK_W, SDLK_S};
+	tPlayerTwo.mFRect.x = tPlayerTwo.mFRect.w;
+	tPlayerTwo.mFRect.y = (xWindowSize.h / 2) - (tPlayerTwo.mFRect.h / 2);
 	tResult.emplace_back(std::move(tPlayerTwo));
 
 	Points tPoints{xWindowSize};
-	tPoints.mRect.x = (xWindowSize.w / 2) - (tPoints.mRect.w / 2);
+	tPoints.mFRect.x = (xWindowSize.w / 2) - (tPoints.mFRect.w / 2);
 	tResult.emplace_back(std::move(tPoints));
 
-	// Because std::variant copys
+	// Because std::variant copy
 	Ball tBall{xWindowSize, std::get<Player>(tResult.at(2)), std::get<Player>(tResult.at(3)), std::get<Points>(tResult.at(4))};
 	tResult.emplace_back(std::move(tBall));
 
@@ -57,9 +57,9 @@ static inline std::vector<UIElement> CreateElements(const WindowSize &xWindowSiz
 
 static inline void InitSDL() noexcept(false)
 {
-	if (SDL_Init(SDL_INIT_VIDEO) != 0)
+	if (!SDL_Init(SDL_INIT_VIDEO))
 		throw std::runtime_error("Unable to init SDL");
-	if (TTF_Init() != 0)
+	if (!TTF_Init())
 		throw std::runtime_error("Unable to init SDL TTF");
 }
 
@@ -69,36 +69,34 @@ int Game::Start() noexcept
 	{
 		InitSDL();
 
-		unique_window_t window{SDL_CreateWindow("Pong", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1028, 720, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI)};
-		unique_renderer_t tRenderer{SDL_CreateRenderer(window.get(), -1, 0U)};
+		unique_window_t window{SDL_CreateWindow("Pong", 1028, 720, SDL_WINDOW_RESIZABLE)};
+		unique_renderer_t tRenderer{SDL_CreateRenderer(window.get(), nullptr)};
 
 		WindowSize tWindowSize{*window};
 
-		std::map<int, bool> tKeyPressed{{SDLK_UP, false}, {SDLK_DOWN, false}, {SDLK_w, false}, {SDLK_s, false}, {SDLK_ESCAPE, false}};
+		std::map<int, bool> tKeyPressed{{SDLK_UP, false}, {SDLK_DOWN, false}, {SDLK_W, false}, {SDLK_S, false}, {SDLK_ESCAPE, false}};
 
 		auto tUIElements{CreateElements(tWindowSize, tKeyPressed)};
 
-		bool isquit = false;
+		bool isQuit = false;
 		SDL_Event event;
 
-		bool run{true};
-
-		while (!isquit)
+		while (!isQuit)
 		{
 			SDL_Delay(10);
 			SDL_PollEvent(&event);
 
 			switch (event.type)
 			{
-			case SDL_QUIT:
-				isquit = true;
+			case SDL_EVENT_QUIT:
+				isQuit = true;
 				break;
-			case SDL_KEYDOWN:
-				if (auto tRes = tKeyPressed.find(event.key.keysym.sym); tRes != tKeyPressed.end())
+			case SDL_EVENT_KEY_DOWN:
+				if (auto tRes = tKeyPressed.find(event.key.key); tRes != tKeyPressed.end())
 					tRes->second = true;
 				break;
-			case SDL_KEYUP:
-				if (auto tRes = tKeyPressed.find(event.key.keysym.sym); tRes != tKeyPressed.end())
+			case SDL_EVENT_KEY_UP:
+				if (auto tRes = tKeyPressed.find(event.key.key); tRes != tKeyPressed.end())
 					tRes->second = false;
 				break;
 			default:
@@ -120,9 +118,6 @@ int Game::Start() noexcept
 			}
 
 			SDL_RenderPresent(tRenderer.get());
-
-			if (!run)
-				continue;
 		}
 
 		SDL_Quit();
@@ -136,6 +131,8 @@ int Game::Start() noexcept
 #else
 		std::cerr << fmt::format("Fatal Error: {}\n", e.what());
 #endif
+    
+		SDL_Quit();
 		return EXIT_FAILURE;
 	}
 }

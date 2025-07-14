@@ -1,10 +1,11 @@
 #pragma once
 
 #include "UIBaseElement.h"
+#include "../WindowSize.h"
 #include "Points.h"
 #include "Player.h"
 
-class Ball : public UIBaseElement
+class Ball final : public UIBaseElement
 {
 public:
 	WindowSize mWindowSize;
@@ -19,10 +20,9 @@ public:
 	Ball(Ball&&) = default;
 
 	explicit Ball(const WindowSize &xWindowSize, const std::reference_wrapper<Player> xPlayerOne, const std::reference_wrapper<Player> xPlayerTwo, std::reference_wrapper<Points> xPoints);
-	~Ball() final = default;
 
 	static void update(Ball &, const WindowSize& xWindowSize) noexcept;
 	static void render(Ball &, SDL_Renderer&) noexcept;
 
-	void Resett() noexcept;
+	void Reset() noexcept;
 };
