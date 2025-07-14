@@ -1,12 +1,13 @@
 #pragma once
 
 #include "UIBaseElement.h"
+#include "../WindowSize.h"
 #include "../SDLElements.h"
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include <filesystem>
 
-class Points : public UIBaseElement
+class Points final : public UIBaseElement
 {
 public:
 	WindowSize mWindowSize;
@@ -22,8 +23,6 @@ public:
 
 	explicit Points(const WindowSize& xWindowSize);
 	Points(const Points &);
-
-	~Points() final = default;
 
 	static void update(Points &, const WindowSize& xWindowSize) noexcept;
 	static void render(Points &, SDL_Renderer&) noexcept;

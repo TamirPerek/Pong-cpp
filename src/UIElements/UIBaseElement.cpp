@@ -1,5 +1,9 @@
 #include "UIBaseElement.h"
 
+#include "../WindowSize.h"
+
+#include <SDL3/SDL_video.h>
+
 // UIBaseElement::UIBaseElement(const SDL_Rect& xRect)
 // 	: mRect{ xRect }, mFRect{ .x = static_cast<float>(xRect.x), .y = static_cast<float>(xRect.y), .w = static_cast<float>(xRect.w), .h = static_cast<float>(xRect.h) }
 // {

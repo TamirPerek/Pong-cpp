@@ -2,7 +2,6 @@
 
 #include <random>
 #include <functional>
-#include <cassert>
 
 Ball::Ball(const WindowSize &xWindowSize, const std::reference_wrapper<Player> xPlayerOne, const std::reference_wrapper<Player> xPlayerTwo, std::reference_wrapper<Points> xPoints)
 	: UIBaseElement{SDL_FRect{0, 0, static_cast<float>(xWindowSize.h / (30 * xWindowSize.hRatio)), static_cast<float>(xWindowSize.h / (30 * xWindowSize.hRatio))}},

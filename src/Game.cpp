@@ -48,7 +48,7 @@ static inline std::vector<UIElement> CreateElements(const WindowSize &xWindowSiz
 	tPoints.mFRect.x = (xWindowSize.w / 2) - (tPoints.mFRect.w / 2);
 	tResult.emplace_back(std::move(tPoints));
 
-	// Because std::variant copys
+	// Because std::variant copy
 	Ball tBall{xWindowSize, std::get<Player>(tResult.at(2)), std::get<Player>(tResult.at(3)), std::get<Points>(tResult.at(4))};
 	tResult.emplace_back(std::move(tBall));
 
@@ -78,12 +78,10 @@ int Game::Start() noexcept
 
 		auto tUIElements{CreateElements(tWindowSize, tKeyPressed)};
 
-		bool isquit = false;
+		bool isQuit = false;
 		SDL_Event event;
 
-		bool run{true};
-
-		while (!isquit)
+		while (!isQuit)
 		{
 			SDL_Delay(10);
 			SDL_PollEvent(&event);
@@ -91,7 +89,7 @@ int Game::Start() noexcept
 			switch (event.type)
 			{
 			case SDL_EVENT_QUIT:
-				isquit = true;
+				isQuit = true;
 				break;
 			case SDL_EVENT_KEY_DOWN:
 				if (auto tRes = tKeyPressed.find(event.key.key); tRes != tKeyPressed.end())
@@ -120,9 +118,6 @@ int Game::Start() noexcept
 			}
 
 			SDL_RenderPresent(tRenderer.get());
-
-			if (!run)
-				continue;
 		}
 
 		SDL_Quit();

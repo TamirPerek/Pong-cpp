@@ -1,7 +1,6 @@
 #pragma once
 
 #include "SDLElements.h"
-#include <SDL3/SDL_rect.h>
 
 class WindowSize
 {
